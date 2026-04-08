@@ -6,6 +6,7 @@ const links = [
   { href: "#hero", label: "Início" },
   { href: "#nossa-historia", label: "Nossa História" },
   { href: "#galeria", label: "Galeria" },
+  { href: "/presentes", label: "Presentes" },
   { href: "#rsvp", label: "Confirmar Presença" },
 ];
 
