@@ -22,3 +22,32 @@ export interface CoupleData {
   timeline: TimelineEvent[];
   gallery: GalleryPhoto[];
 }
+
+export interface Gift {
+  _id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  price: number; // BRL cents
+  externalUrl: string;
+  status: "available" | "reserved" | "purchased";
+  claimedBy: string | null;
+  claimedAt: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PixSettings {
+  keyType: "cpf" | "email" | "phone" | "random";
+  keyValue: string;
+  recipientName: string;
+  city: string;
+}
+
+export interface Rsvp {
+  _id: string;
+  name: string;
+  cellphone: string;
+  submittedAt: string;
+}
