@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5e6d3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8d5c4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c9a96e;stop-opacity:0" />
+      <stop offset="50%" style="stop-color:#c9a96e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c9a96e;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)" />
+  <circle cx="600" cy="320" r="120" fill="none" stroke="#c9a96e" stroke-width="1.5" opacity="0.4" />
+  <circle cx="600" cy="320" r="150" fill="none" stroke="#c9a96e" stroke-width="0.8" opacity="0.25" />
+  <path d="M560 310 C560 280, 600 260, 600 290 C600 260, 640 280, 640 310 C640 340, 600 370, 600 370 C600 370, 560 340, 560 310Z" fill="#c9a96e" opacity="0.3" />
+  <text x="600" y="460" font-family="Georgia, 'Times New Roman', serif" font-size="56" fill="#8b7355" text-anchor="middle" font-style="italic">Carol &amp; Joao</text>
+  <line x1="400" y1="500" x2="800" y2="500" stroke="url(#accent)" stroke-width="1" />
+  <text x="600" y="540" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#a89279" text-anchor="middle" letter-spacing="4">15 DE NOVEMBRO DE 2026</text>
+  <text x="600" y="750" font-family="Arial, sans-serif" font-size="14" fill="#bba88a" text-anchor="middle" opacity="0.6">placeholder - 1200 x 800</text>
+</svg>

@@ -1,0 +1,14 @@
+schema: spec-driven
+
+# Project context
+context: |
+  Domain: Wedding website for Carol & João
+  Language: All user-facing content in Portuguese (pt-BR)
+  Will integrate with MercadoPago probably
+
+# Per-artifact rules (optional)
+# rules:
+#   proposal:
+#     - Keep proposals under 500 words
+#   tasks:
+#     - Break tasks into chunks of max 2 hours
