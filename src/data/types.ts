@@ -17,10 +17,18 @@ export interface GalleryPhoto {
   alt: string;
 }
 
+export interface WeddingDayData {
+  date: string;
+  time: string;
+  ceremony: { name: string; address: string; embedUrl: string; mapUrl: string };
+  reception: { name: string; start: string; end: string; embedUrl: string; mapUrl: string };
+}
+
 export interface CoupleData {
   hero: HeroData;
   timeline: TimelineEvent[];
   gallery: GalleryPhoto[];
+  weddingDay: WeddingDayData;
 }
 
 export interface Gift {
