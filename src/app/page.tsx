@@ -11,7 +11,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero data={coupleData.hero} />
-        <Timeline events={coupleData.timeline} />
+        <Timeline events={coupleData.timeline} weddingDay={coupleData.weddingDay} />
         <PhotoGallery photos={coupleData.gallery} />
         <section id="rsvp" className="bg-section-alt py-20">
           <div className="mx-auto max-w-md px-6">

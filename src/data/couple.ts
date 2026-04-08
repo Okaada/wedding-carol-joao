@@ -3,7 +3,7 @@ import { CoupleData } from "./types";
 export const coupleData: CoupleData = {
   hero: {
     names: "Carol & João",
-    date: "15 de Novembro de 2026",
+    date: "24 de outubro de 2026",
     subtitle: "Vamos celebrar o nosso amor",
     image: "/images/hero-couple.svg",
   },
@@ -37,7 +37,7 @@ export const coupleData: CoupleData = {
       image: "/images/timeline-04.svg",
     },
     {
-      date: "15 de Novembro de 2026",
+      date: "24 de outubro de 2026",
       title: "O grande dia",
       description:
         "E agora estamos aqui, prontos para celebrar o nosso amor com as pessoas mais especiais das nossas vidas. Que venha essa nova fase!",
@@ -51,4 +51,24 @@ export const coupleData: CoupleData = {
     { src: "/images/pose-ponte.jpeg", alt: "Pose na ponte" },
     { src: "/images/pose-ponte-longe.jpeg", alt: "Pose na ponte ao longe" },
   ],
+  weddingDay: {
+    date: "24 de outubro de 2026",
+    time: "16h",
+    ceremony: {
+      name: "Paróquia Santa Cruz",
+      address: "Rua Sinharinha Frota, 1772, Jardim Buscardi",
+      embedUrl:
+        "https://maps.google.com/maps?q=Rua+Sinharinha+Frota,+1772,+Jardim+Buscardi,+SP,+Brasil&output=embed",
+      mapUrl:
+        "https://maps.google.com/maps?q=Rua+Sinharinha+Frota,+1772,+Jardim+Buscardi,+SP,+Brasil",
+    },
+    reception: {
+      name: "Radaelli Eventos",
+      start: "Início após a cerimônia",
+      end: "Término às 01h00",
+      embedUrl:
+        "https://maps.google.com/maps?q=Radaelli+Eventos+Jardim+Buscardi&output=embed",
+      mapUrl: "https://maps.app.goo.gl/aA2FqgRfxcsLLbUD6?g_st=ic",
+    },
+  },
 };
