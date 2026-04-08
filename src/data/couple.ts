@@ -5,7 +5,7 @@ export const coupleData: CoupleData = {
     names: "Carol & João",
     date: "24 de outubro de 2026",
     subtitle: "Vamos celebrar o nosso amor",
-    image: "/images/hero-couple.svg",
+    image: "/images/espontanea-mar.jpeg",
   },
   timeline: [
     {

@@ -27,6 +27,7 @@ export default function AdminLoginPage() {
       setError("Email ou senha incorretos.");
     } else {
       router.push("/admin");
+      router.refresh();
     }
   }
 
