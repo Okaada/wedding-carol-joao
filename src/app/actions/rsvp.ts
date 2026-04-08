@@ -1,7 +1,6 @@
 "use server";
 
-import fs from "fs";
-import path from "path";
+import { getMongoClient } from "@/lib/mongodb";
 
 export type RsvpResult = { success: boolean; error?: string };
 
@@ -19,13 +18,16 @@ export async function submitRsvp(
     return { success: false, error: "Por favor, informe seu celular." };
   }
 
-  const record = JSON.stringify({ name, cellphone, submittedAt: new Date().toISOString() });
-
-  const dataDir = path.join(process.cwd(), "data");
-  const filePath = path.join(dataDir, "rsvp.json");
-
-  fs.mkdirSync(dataDir, { recursive: true });
-  fs.appendFileSync(filePath, record + "\n", "utf-8");
-
-  return { success: true };
+  try {
+    const client = await getMongoClient();
+    const collection = client.db("carol-joao").collection("rsvp");
+    await collection.insertOne({ name, cellphone, submittedAt: new Date().toISOString() });
+    return { success: true };
+  } catch (error) {
+    console.log(error)
+    return {
+      success: false,
+      error: "Não foi possível confirmar sua presença. Tente novamente em alguns instantes.",
+    };
+  }
 }

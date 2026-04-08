@@ -5,7 +5,9 @@
       "Bash(openspec instructions:*)",
       "Bash(npx tsc:*)",
       "Bash(openspec new:*)",
-      "Bash(openspec status:*)"
+      "Bash(openspec status:*)",
+      "Bash(openspec list:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
