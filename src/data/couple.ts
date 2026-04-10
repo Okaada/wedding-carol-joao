@@ -9,38 +9,44 @@ export const coupleData: CoupleData = {
   },
   timeline: [
     {
-      date: "Março de 2018",
+      date: "2016",
       title: "Como tudo começou",
       description:
-        "Nos conhecemos em uma festa de amigos em comum. Foi amor à primeira vista — ou quase. João tropeçou ao se apresentar e Carol não conseguiu parar de rir.",
+        "Nos conhecemos no ensino médio e, entre olhares e conversas, algo especial foi nascendo — mas nenhum dos dois tinha coragem de dar o primeiro passo. Até que o destino resolveu agir: Julia, a melhor amiga da Carol, pegou o celular e mandou um 'OOOIIII' bem corajoso pro João. E foi assim, de forma leve e divertida, que tudo começou.",
       image: "/images/timeline-01.svg",
     },
     {
-      date: "Junho de 2018",
-      title: "Primeiro encontro",
+      date: "27 de fevereiro de 2017",
+      title: "O início do namoro",
       description:
-        "Depois de semanas trocando mensagens, finalmente marcamos um café. O café virou almoço, que virou jantar, que virou uma caminhada até as estrelas aparecerem.",
+        "Depois daquela mensagem, as conversas não pararam mais. Cada dia o assunto rendia mais, e o que começou como amizade foi se transformando em algo que nenhum dos dois conseguia ignorar. Em 27 de fevereiro de 2017, decidimos que era oficial: estávamos juntos.",
       image: "/images/timeline-02.svg",
     },
     {
-      date: "Setembro de 2018",
-      title: "Início do namoro",
+      date: "2017 – 2024",
+      title: "Juntos, mesmo à distância",
       description:
-        "Em um pôr do sol na praia, João pediu Carol em namoro. Ela disse sim antes mesmo dele terminar a frase.",
+        "Ensino médio, vestibular, faculdade, mudanças de cidade, estágios, TCC, início de carreira... ao longo desses 7 anos, a vida foi nos levando por caminhos diferentes, mas o nosso relacionamento nunca deixou de ser prioridade. Mesmo à distância, o amor só ficou mais forte — entre ligações longas, saudade e muita cumplicidade.",
       image: "/images/timeline-03.svg",
     },
     {
-      date: "Dezembro de 2023",
-      title: "O pedido de casamento",
+      date: "2024",
+      title: "Finalmente na mesma cidade",
       description:
-        "Durante uma viagem especial, João planejou tudo nos mínimos detalhes. Com o anel escondido no bolso e o coração acelerado, ele se ajoelhou e fez a pergunta mais importante da sua vida.",
+        "Em 2024, depois de anos mesmo com a distância, nossas rotinas finalmente se cruzaram em Matão. Poder estar juntos no dia a dia, sem contar os quilômetros, nos mostrou com ainda mais certeza o que já sabíamos: queríamos dividir a vida inteira, um do lado do outro.",
       image: "/images/timeline-04.svg",
+    },
+    {
+      date: "26 de janeiro de 2025",
+      title: "O pedido",
+      description:
+        "No show da banda favorita da Carol, enquanto tocava a música que ela mais ama, João fez a pergunta mais importante da sua vida. E entre lágrimas, sorrisos e o som da multidão, veio a resposta mais linda: SIM!",
     },
     {
       date: "24 de outubro de 2026",
       title: "O grande dia",
       description:
-        "E agora estamos aqui, prontos para celebrar o nosso amor com as pessoas mais especiais das nossas vidas. Que venha essa nova fase!",
+        "Depois de tantos anos de história, chegou o momento de celebrar o nosso amor com as pessoas mais especiais das nossas vidas. Que venha essa nova fase — juntos, como sempre foi.",
     },
   ],
   gallery: [

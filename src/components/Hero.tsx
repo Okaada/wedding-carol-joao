@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { HeroData } from "@/data/types";
+import Countdown from "./Countdown";
 
 interface HeroProps {
   data: HeroData;
@@ -15,6 +16,7 @@ export default function Hero({ data }: HeroProps) {
         src={data.image}
         alt={data.names}
         fill
+        sizes="100vw"
         priority
         className="object-cover brightness-50 blur-sm scale-110"
       />
@@ -29,6 +31,7 @@ export default function Hero({ data }: HeroProps) {
         <p className="mt-2 text-lg tracking-widest text-white/90 md:text-xl">
           {data.date}
         </p>
+        <Countdown />
       </div>
     </section>
   );
