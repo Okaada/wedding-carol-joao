@@ -37,6 +37,7 @@ export default function TimelineItem({ event, index }: TimelineItemProps) {
               src={event.image}
               alt={event.title}
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
