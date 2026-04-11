@@ -11,13 +11,26 @@ const navItems = [
   { href: "/admin/settings", label: "Configurações" },
 ];
 
-export default function AdminSidebar() {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AdminSidebar({ isOpen, onClose }: Props) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-56 shrink-0 flex-col border-r border-accent bg-section-alt">
+    <aside
+      className={`fixed inset-y-0 left-0 z-30 flex h-screen w-56 shrink-0 flex-col border-r border-accent bg-section-alt transition-transform duration-200 md:relative md:translate-x-0 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div className="border-b border-accent px-5 py-5">
-        <Link href="/admin" className="font-[family-name:var(--font-playfair)] text-lg font-bold text-foreground">
+        <Link
+          href="/admin"
+          onClick={onClose}
+          className="font-[family-name:var(--font-playfair)] text-lg font-bold text-foreground"
+        >
           C &amp; J Admin
         </Link>
       </div>
@@ -30,6 +43,7 @@ export default function AdminSidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onClose}
                   className={`block rounded-md px-3 py-2 text-sm transition-colors ${
                     active
                       ? "bg-primary text-white"
@@ -53,6 +67,7 @@ export default function AdminSidebar() {
         </button>
         <Link
           href="/"
+          onClick={onClose}
           className="mt-1 block rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-accent/50 hover:text-foreground"
         >
           Ver site

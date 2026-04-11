@@ -25,7 +25,7 @@ export default async function UsersPage() {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-accent">
-        <table className="w-full text-left text-sm">
+        <table className="min-w-max w-full text-left text-sm">
           <thead className="border-b border-accent bg-section-alt">
             <tr>
               <th className="px-4 py-3 font-medium text-muted">Nome</th>

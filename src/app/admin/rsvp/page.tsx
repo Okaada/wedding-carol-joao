@@ -29,7 +29,7 @@ export default async function RsvpPage({ searchParams }: Props) {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-foreground">
           Confirmações
         </h1>
@@ -53,7 +53,7 @@ export default async function RsvpPage({ searchParams }: Props) {
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-accent">
-        <table className="w-full text-left text-sm">
+        <table className="min-w-max w-full text-left text-sm">
           <thead className="border-b border-accent bg-section-alt">
             <tr>
               <th className="px-4 py-3 font-medium text-muted">Nome</th>
