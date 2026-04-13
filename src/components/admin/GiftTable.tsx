@@ -22,13 +22,14 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
             <th className="px-4 py-3 font-medium text-muted">Nome</th>
             <th className="px-4 py-3 font-medium text-muted">Preço</th>
             <th className="px-4 py-3 font-medium text-muted">Status</th>
+            <th className="px-4 py-3 font-medium text-muted">Pagamento</th>
             <th className="px-4 py-3 font-medium text-muted">Ações</th>
           </tr>
         </thead>
         <tbody>
           {gifts.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-muted">
+              <td colSpan={6} className="px-4 py-8 text-center text-muted">
                 Nenhum presente cadastrado.
               </td>
             </tr>
@@ -52,6 +53,9 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
                 <td className="px-4 py-3 text-foreground">{formatPrice(gift.price)}</td>
                 <td className="px-4 py-3">
                   <GiftStatusBadge status={gift.status} />
+                </td>
+                <td className="px-4 py-3 text-xs text-muted">
+                  {gift.paymentId ? gift.paymentId : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">

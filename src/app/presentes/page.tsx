@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getMongoClient } from "@/lib/mongodb";
+import { releaseExpiredReservations } from "@/lib/gifts";
 import GiftCard from "@/components/GiftCard";
 import PixSection from "@/components/PixSection";
 import type { Gift, PixSettings } from "@/data/types";
@@ -9,6 +10,8 @@ export const metadata = {
 };
 
 export default async function PresentesPage() {
+  await releaseExpiredReservations();
+
   const client = await getMongoClient();
   const db = client.db("carol-joao");
 

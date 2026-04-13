@@ -21,10 +21,20 @@ function tlv(id: string, value: string): string {
   return id + value.length.toString().padStart(2, "0") + value;
 }
 
+function normalizeAscii(str: string): string {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
+
 export function generatePixPayload(settings: PixSettings): string {
   const gui = tlv("00", "br.gov.bcb.pix");
   const key = tlv("01", settings.keyValue);
   const merchantAccount = tlv("26", gui + key);
+
+  const name = normalizeAscii(settings.recipientName).substring(0, 25);
+  const city = normalizeAscii(settings.city).substring(0, 15);
 
   let payload = "";
   payload += tlv("00", "01"); // Payload Format Indicator
@@ -32,8 +42,8 @@ export function generatePixPayload(settings: PixSettings): string {
   payload += tlv("52", "0000"); // Merchant Category Code
   payload += tlv("53", "986"); // Transaction Currency (BRL)
   payload += tlv("58", "BR"); // Country Code
-  payload += tlv("59", settings.recipientName.substring(0, 25));
-  payload += tlv("60", settings.city.substring(0, 15));
+  payload += tlv("59", name);
+  payload += tlv("60", city);
   payload += tlv("62", tlv("05", "***")); // Additional data
 
   // CRC16 placeholder

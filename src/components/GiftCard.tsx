@@ -6,35 +6,32 @@ import type { Gift } from "@/data/types";
 
 export default function GiftCard({ gift }: { gift: Gift }) {
   const [status, setStatus] = useState(gift.status);
-  const [showClaim, setShowClaim] = useState(false);
-  const [guestName, setGuestName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const isAvailable = status === "available";
 
-  async function handleClaim() {
-    if (!guestName.trim()) {
-      setError("Por favor, informe seu nome.");
-      return;
-    }
+  async function handleCheckout() {
     setLoading(true);
     setError("");
 
-    const res = await fetch(`/api/gifts/${gift._id}/claim`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ guestName: guestName.trim() }),
-    });
+    try {
+      const res = await fetch(`/api/gifts/${gift._id}/checkout`, {
+        method: "POST",
+      });
 
-    setLoading(false);
-    if (res.ok) {
-      setStatus("reserved");
-      setShowClaim(false);
-    } else {
-      const data = await res.json();
-      setError(data.error || "Erro ao reservar presente.");
-      if (res.status === 409) setStatus("reserved");
+      if (res.ok) {
+        const data = await res.json();
+        window.location.href = data.checkoutUrl;
+      } else {
+        const data = await res.json();
+        setError(data.error || "Erro ao iniciar pagamento.");
+        if (res.status === 409) setStatus("reserved");
+        setLoading(false);
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+      setLoading(false);
     }
   }
 
@@ -59,60 +56,29 @@ export default function GiftCard({ gift }: { gift: Gift }) {
         </p>
 
         {isAvailable ? (
-          <>
-            <div className="flex flex-col gap-2">
-              {gift.externalUrl && (
-                <a
-                  href={gift.externalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block rounded-lg border border-primary px-4 py-2 text-center text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
-                >
-                  Comprar no MercadoLivre
-                </a>
-              )}
-              <button
-                onClick={() => setShowClaim(true)}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-light"
+          <div className="flex flex-col gap-2">
+            {gift.externalUrl && (
+              <a
+                href={gift.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-lg border border-primary px-4 py-2 text-center text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
               >
-                Quero presentear
-              </button>
-            </div>
-
-            {showClaim && (
-              <div className="mt-3 space-y-2 rounded-lg bg-section-alt p-3">
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  placeholder="Seu nome"
-                  className="w-full rounded-md border border-accent bg-white px-3 py-2 text-sm outline-none focus:border-primary"
-                />
-                {error && <p className="text-xs text-red-600">{error}</p>}
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleClaim}
-                    disabled={loading}
-                    className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-                  >
-                    {loading ? "Reservando..." : "Confirmar"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowClaim(false);
-                      setError("");
-                    }}
-                    className="rounded-md px-3 py-1.5 text-xs text-muted hover:text-foreground"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
+                Comprar no MercadoLivre
+              </a>
             )}
-          </>
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-light disabled:opacity-50"
+            >
+              {loading ? "Redirecionando..." : "Presentear"}
+            </button>
+            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+          </div>
         ) : (
           <div className="rounded-lg bg-section-alt px-4 py-2 text-center text-sm text-muted">
-            Presente reservado
+            {status === "reserved" ? "Presente sendo pago" : "Presente reservado"}
           </div>
         )}
       </div>

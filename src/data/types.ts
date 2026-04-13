@@ -41,6 +41,8 @@ export interface Gift {
   status: "available" | "reserved" | "purchased";
   claimedBy: string | null;
   claimedAt: string | null;
+  reservedAt: string | null;
+  paymentId: string | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
