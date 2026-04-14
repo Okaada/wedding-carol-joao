@@ -1,13 +1,19 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { generateLoginState } from "@/app/actions/auth-state";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginState, setLoginState] = useState("");
+
+  useEffect(() => {
+    generateLoginState().then(setLoginState);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,13 +24,18 @@ export default function AdminLoginPage() {
     const result = await signIn("credentials", {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
+      loginState,
       redirect: false,
     });
 
     setLoading(false);
 
-    if (result?.error) {
+    if (result?.code === "rate_limited") {
+      setError("Muitas tentativas de login. Tente novamente em 15 minutos.");
+      generateLoginState().then(setLoginState);
+    } else if (result?.error) {
       setError("Email ou senha incorretos.");
+      generateLoginState().then(setLoginState);
     } else {
       router.push("/admin");
       router.refresh();

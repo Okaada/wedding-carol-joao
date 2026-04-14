@@ -5,6 +5,7 @@ import { getMongoClient } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { validatePassword } from "@/lib/auth-utils";
 
 async function requireAuth() {
   const session = await auth();
@@ -45,8 +46,12 @@ export async function createAdminUser(
 
   if (!name) return { success: false, error: "Nome e obrigatorio." };
   if (!email) return { success: false, error: "Email e obrigatorio." };
-  if (!password || password.length < 6) {
-    return { success: false, error: "Senha deve ter no minimo 6 caracteres." };
+  if (!password) {
+    return { success: false, error: "Senha e obrigatoria." };
+  }
+  const passwordCheck = validatePassword(password);
+  if (!passwordCheck.valid) {
+    return { success: false, error: passwordCheck.error! };
   }
 
   try {
