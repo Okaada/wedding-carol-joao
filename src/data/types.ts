@@ -38,11 +38,15 @@ export interface Gift {
   imageUrl: string;
   price: number; // BRL cents
   externalUrl: string;
-  status: "available" | "reserved" | "purchased";
+  purchaseMode: "mercadopago" | "external";
+  status: "available" | "reserved" | "purchased" | "claimed";
   claimedBy: string | null;
   claimedAt: string | null;
   reservedAt: string | null;
   paymentId: string | null;
+  buyerType: "individual" | "couple" | "group" | null;
+  buyerName: string | null;
+  buyerNames: string[] | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;

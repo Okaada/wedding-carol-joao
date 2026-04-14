@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { getMongoClient } from "@/lib/mongodb";
 import { releaseExpiredReservations } from "@/lib/gifts";
+import { isPanicModeActive } from "@/lib/panic-mode";
+import { generatePixQrCodeDataUrl, generatePixPayload } from "@/lib/pix";
 import GiftCard from "@/components/GiftCard";
 import PixSection from "@/components/PixSection";
 import type { Gift, PixSettings } from "@/data/types";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Lista de Presentes — Carol & João",
@@ -24,6 +28,26 @@ export default async function PresentesPage() {
 
   const pixDoc = await db.collection("settings").findOne({ key: "pix" });
   const pixSettings = pixDoc?.value as PixSettings | undefined;
+  const panicMode = await isPanicModeActive();
+
+  // Pre-generate PIX QR codes for external gifts (or all gifts in panic mode)
+  const pixDataMap: Record<string, { qrCodeUrl: string; payload: string }> = {};
+  if (pixSettings) {
+    for (const gift of gifts) {
+      const mode = gift.purchaseMode ?? "mercadopago";
+      const needsPix =
+        (mode === "external" && gift.price > 0) ||
+        (panicMode && gift.price > 0);
+      if (needsPix) {
+        const amountBrl = gift.price / 100;
+        const [qrCodeUrl, payload] = await Promise.all([
+          generatePixQrCodeDataUrl(pixSettings, amountBrl),
+          Promise.resolve(generatePixPayload(pixSettings, amountBrl)),
+        ]);
+        pixDataMap[gift._id] = { qrCodeUrl, payload };
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,7 +71,13 @@ export default async function PresentesPage() {
         {gifts.length > 0 && (
           <div className="mb-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {gifts.map((gift) => (
-              <GiftCard key={gift._id} gift={gift} />
+              <GiftCard
+                key={gift._id}
+                gift={gift}
+                pixQrCodeUrl={pixDataMap[gift._id]?.qrCodeUrl}
+                pixPayload={pixDataMap[gift._id]?.payload}
+                panicMode={panicMode}
+              />
             ))}
           </div>
         )}

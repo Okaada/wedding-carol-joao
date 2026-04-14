@@ -1,13 +1,26 @@
 import { getMongoClient } from "@/lib/mongodb";
 import { getPreferenceClient } from "@/lib/mercadopago";
 import { releaseExpiredReservations } from "@/lib/gifts";
+import { logMpError } from "@/lib/mp-errors";
 import { ObjectId } from "mongodb";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+
+  let buyerName: string | null = null;
+  let buyerType: string | null = null;
+  let buyerNames: string[] | null = null;
+  try {
+    const body = await request.json();
+    buyerName = (body.buyerName as string)?.trim() || null;
+    buyerType = body.buyerType || null;
+    buyerNames = body.buyerNames || null;
+  } catch {
+    // Body is optional for backwards compatibility
+  }
 
   let objectId: ObjectId;
   try {
@@ -30,6 +43,11 @@ export async function POST(
         status: "reserved",
         reservedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        ...(buyerName && {
+          buyerName,
+          buyerType,
+          buyerNames: buyerNames ?? [buyerName],
+        }),
       },
     },
     { returnDocument: "after" },
@@ -85,6 +103,7 @@ export async function POST(
     );
 
     console.error("Mercado Pago preference error:", err);
+    await logMpError(id, err instanceof Error ? err.message : String(err));
     return Response.json(
       { error: "Erro ao criar pagamento. Tente novamente." },
       { status: 500 },

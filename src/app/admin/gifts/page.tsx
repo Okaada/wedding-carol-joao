@@ -13,6 +13,8 @@ export default async function GiftsPage() {
 
   const available = gifts.filter((g) => g.status === "available").length;
   const reserved = gifts.filter((g) => g.status === "reserved").length;
+  const claimed = gifts.filter((g) => g.status === "claimed").length;
+  const purchased = gifts.filter((g) => g.status === "purchased").length;
 
   return (
     <div>
@@ -28,10 +30,12 @@ export default async function GiftsPage() {
         </Link>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatsCard label="Total" value={gifts.length} />
         <StatsCard label="Disponíveis" value={available} />
         <StatsCard label="Reservados" value={reserved} />
+        <StatsCard label="Reservados (ext.)" value={claimed} />
+        <StatsCard label="Comprados" value={purchased} />
       </div>
 
       <GiftTable gifts={gifts} />

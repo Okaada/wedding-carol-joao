@@ -1,3 +1,4 @@
+import ConstructionBanner from "@/components/ConstructionBanner";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Timeline from "@/components/Timeline";
@@ -8,6 +9,7 @@ import { coupleData } from "@/data/couple";
 export default function Home() {
   return (
     <>
+      <ConstructionBanner />
       <Navbar />
       <main>
         <Hero data={coupleData.hero} />

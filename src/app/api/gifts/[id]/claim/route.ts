@@ -7,10 +7,31 @@ export async function POST(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const guestName = (body.guestName as string)?.trim();
 
-  if (!guestName) {
+  const buyerName = (body.buyerName as string)?.trim();
+  const buyerType = body.buyerType as string;
+  const buyerNames = body.buyerNames as string[] | undefined;
+
+  if (!buyerName) {
     return Response.json({ error: "Nome é obrigatório." }, { status: 400 });
+  }
+
+  if (!["individual", "couple", "group"].includes(buyerType)) {
+    return Response.json({ error: "Tipo de comprador inválido." }, { status: 400 });
+  }
+
+  if (buyerType === "couple" && (!buyerNames || buyerNames.length < 2)) {
+    return Response.json(
+      { error: "Informe pelo menos 2 nomes para casal." },
+      { status: 400 },
+    );
+  }
+
+  if (buyerType === "group" && (!buyerNames || buyerNames.length < 2)) {
+    return Response.json(
+      { error: "Informe pelo menos 2 nomes para grupo." },
+      { status: 400 },
+    );
   }
 
   let objectId: ObjectId;
@@ -28,8 +49,11 @@ export async function POST(
       { _id: objectId, status: "available" },
       {
         $set: {
-          status: "reserved",
-          claimedBy: guestName,
+          status: "claimed",
+          buyerType,
+          buyerName,
+          buyerNames: buyerNames ?? [buyerName],
+          claimedBy: buyerName,
           claimedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },

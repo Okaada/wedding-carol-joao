@@ -12,6 +12,10 @@ interface Props {
     price?: string;
     externalUrl?: string;
     status?: string;
+    purchaseMode?: string;
+    buyerType?: string;
+    buyerName?: string;
+    buyerNames?: string[];
   };
   showStatus?: boolean;
 }
@@ -91,6 +95,21 @@ export default function GiftForm({ action, defaultValues = {}, showStatus }: Pro
         />
       </div>
 
+      <div>
+        <label htmlFor="purchaseMode" className="mb-1 block text-sm font-medium text-foreground">
+          Modo de compra
+        </label>
+        <select
+          id="purchaseMode"
+          name="purchaseMode"
+          defaultValue={defaultValues.purchaseMode ?? "mercadopago"}
+          className="w-full rounded-lg border border-accent bg-white px-4 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+        >
+          <option value="mercadopago">Mercado Pago</option>
+          <option value="external">Compra externa</option>
+        </select>
+      </div>
+
       {showStatus && (
         <div>
           <label htmlFor="status" className="mb-1 block text-sm font-medium text-foreground">
@@ -105,7 +124,51 @@ export default function GiftForm({ action, defaultValues = {}, showStatus }: Pro
             <option value="available">Disponível</option>
             <option value="reserved">Reservado</option>
             <option value="purchased">Comprado</option>
+            <option value="claimed">Reservado (externo)</option>
           </select>
+        </div>
+      )}
+
+      {showStatus && defaultValues.buyerName && (
+        <div className="rounded-lg border border-accent bg-section-alt p-4">
+          <p className="mb-2 text-sm font-medium text-foreground">Informações do comprador</p>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="buyerType" className="mb-1 block text-xs text-muted">Tipo</label>
+              <select
+                id="buyerType"
+                name="buyerType"
+                defaultValue={defaultValues.buyerType ?? ""}
+                className="w-full rounded-lg border border-accent bg-white px-4 py-2 text-sm text-foreground outline-none focus:border-primary"
+              >
+                <option value="">—</option>
+                <option value="individual">Individual</option>
+                <option value="couple">Casal</option>
+                <option value="group">Grupo</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="buyerName" className="mb-1 block text-xs text-muted">Nome principal</label>
+              <input
+                id="buyerName"
+                name="buyerName"
+                type="text"
+                defaultValue={defaultValues.buyerName ?? ""}
+                className="w-full rounded-lg border border-accent bg-white px-4 py-2 text-sm text-foreground outline-none focus:border-primary"
+              />
+            </div>
+            {defaultValues.buyerNames && defaultValues.buyerNames.length > 0 && (
+              <div>
+                <label className="mb-1 block text-xs text-muted">Outros nomes</label>
+                <input
+                  name="buyerNames"
+                  type="text"
+                  defaultValue={defaultValues.buyerNames.join(", ")}
+                  className="w-full rounded-lg border border-accent bg-white px-4 py-2 text-sm text-foreground outline-none focus:border-primary"
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 

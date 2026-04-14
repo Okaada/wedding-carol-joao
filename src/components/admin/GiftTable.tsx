@@ -22,6 +22,7 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
             <th className="px-4 py-3 font-medium text-muted">Nome</th>
             <th className="px-4 py-3 font-medium text-muted">Preço</th>
             <th className="px-4 py-3 font-medium text-muted">Status</th>
+            <th className="px-4 py-3 font-medium text-muted">Comprador</th>
             <th className="px-4 py-3 font-medium text-muted">Pagamento</th>
             <th className="px-4 py-3 font-medium text-muted">Ações</th>
           </tr>
@@ -29,7 +30,7 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
         <tbody>
           {gifts.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-8 text-center text-muted">
+              <td colSpan={7} className="px-4 py-8 text-center text-muted">
                 Nenhum presente cadastrado.
               </td>
             </tr>
@@ -53,6 +54,38 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
                 <td className="px-4 py-3 text-foreground">{formatPrice(gift.price)}</td>
                 <td className="px-4 py-3">
                   <GiftStatusBadge status={gift.status} />
+                </td>
+                <td className="px-4 py-3">
+                  {gift.buyerName ? (
+                    <div>
+                      <span className="text-sm text-foreground">
+                        {gift.buyerType === "couple" && gift.buyerNames
+                          ? gift.buyerNames.join(" & ")
+                          : gift.buyerType === "group" && gift.buyerNames
+                            ? gift.buyerNames.join(", ")
+                            : gift.buyerName}
+                      </span>
+                      {gift.buyerType && (
+                        <span
+                          className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                            gift.buyerType === "individual"
+                              ? "bg-gray-100 text-gray-700"
+                              : gift.buyerType === "couple"
+                                ? "bg-pink-100 text-pink-700"
+                                : "bg-purple-100 text-purple-700"
+                          }`}
+                        >
+                          {gift.buyerType === "individual"
+                            ? "Individual"
+                            : gift.buyerType === "couple"
+                              ? "Casal"
+                              : "Grupo"}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-xs text-muted">
                   {gift.paymentId ? gift.paymentId : "—"}

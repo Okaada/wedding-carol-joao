@@ -28,7 +28,10 @@ function normalizeAscii(str: string): string {
     .toUpperCase();
 }
 
-export function generatePixPayload(settings: PixSettings): string {
+export function generatePixPayload(
+  settings: PixSettings,
+  amount?: number,
+): string {
   const gui = tlv("00", "br.gov.bcb.pix");
   const key = tlv("01", settings.keyValue);
   const merchantAccount = tlv("26", gui + key);
@@ -41,6 +44,9 @@ export function generatePixPayload(settings: PixSettings): string {
   payload += merchantAccount;
   payload += tlv("52", "0000"); // Merchant Category Code
   payload += tlv("53", "986"); // Transaction Currency (BRL)
+  if (amount && amount > 0) {
+    payload += tlv("54", amount.toFixed(2)); // Transaction Amount
+  }
   payload += tlv("58", "BR"); // Country Code
   payload += tlv("59", name);
   payload += tlv("60", city);
@@ -56,8 +62,9 @@ export function generatePixPayload(settings: PixSettings): string {
 
 export async function generatePixQrCodeDataUrl(
   settings: PixSettings,
+  amount?: number,
 ): Promise<string> {
-  const payload = generatePixPayload(settings);
+  const payload = generatePixPayload(settings, amount);
   return QRCode.toDataURL(payload, {
     width: 300,
     margin: 2,

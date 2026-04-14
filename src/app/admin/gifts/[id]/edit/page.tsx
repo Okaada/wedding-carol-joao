@@ -47,6 +47,10 @@ export default async function EditGiftPage({ params }: Props) {
           price: ((gift.price as number) / 100).toFixed(2).replace(".", ","),
           externalUrl: gift.externalUrl as string,
           status: gift.status as string,
+          purchaseMode: (gift.purchaseMode as string) ?? "mercadopago",
+          buyerType: (gift.buyerType as string) ?? "",
+          buyerName: (gift.buyerName as string) ?? "",
+          buyerNames: (gift.buyerNames as string[]) ?? [],
         }}
       />
     </div>

@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { extractMercadoLivreImage } from "@/lib/mercadolivre";
 import { getMongoClient } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
@@ -23,6 +24,7 @@ export async function createGift(
   const imageUrl = (formData.get("imageUrl") as string)?.trim() ?? "";
   const priceStr = (formData.get("price") as string)?.trim();
   const externalUrl = (formData.get("externalUrl") as string)?.trim() ?? "";
+  const purchaseMode = (formData.get("purchaseMode") as string) ?? "mercadopago";
 
   if (!name) return { success: false, error: "Nome é obrigatório." };
   if (!priceStr) return { success: false, error: "Preço é obrigatório." };
@@ -30,6 +32,11 @@ export async function createGift(
   const price = Math.round(parseFloat(priceStr.replace(",", ".")) * 100);
   if (isNaN(price) || price <= 0) {
     return { success: false, error: "Preço inválido." };
+  }
+
+  let resolvedImageUrl = imageUrl;
+  if (!resolvedImageUrl && externalUrl) {
+    resolvedImageUrl = (await extractMercadoLivreImage(externalUrl)) ?? "";
   }
 
   try {
@@ -40,12 +47,18 @@ export async function createGift(
     await collection.insertOne({
       name,
       description,
-      imageUrl,
+      imageUrl: resolvedImageUrl,
       price,
       externalUrl,
+      purchaseMode,
       status: "available",
       claimedBy: null,
       claimedAt: null,
+      reservedAt: null,
+      paymentId: null,
+      buyerType: null,
+      buyerName: null,
+      buyerNames: null,
       sortOrder: count,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -72,6 +85,13 @@ export async function updateGift(
   const priceStr = (formData.get("price") as string)?.trim();
   const externalUrl = (formData.get("externalUrl") as string)?.trim() ?? "";
   const status = (formData.get("status") as string) ?? "available";
+  const purchaseMode = (formData.get("purchaseMode") as string) ?? "mercadopago";
+  const buyerType = (formData.get("buyerType") as string) || null;
+  const buyerName = (formData.get("buyerName") as string)?.trim() || null;
+  const buyerNamesRaw = (formData.get("buyerNames") as string)?.trim() || null;
+  const buyerNames = buyerNamesRaw
+    ? buyerNamesRaw.split(",").map((n: string) => n.trim()).filter(Boolean)
+    : null;
 
   if (!name) return { success: false, error: "Nome é obrigatório." };
   if (!priceStr) return { success: false, error: "Preço é obrigatório." };
@@ -79,6 +99,11 @@ export async function updateGift(
   const price = Math.round(parseFloat(priceStr.replace(",", ".")) * 100);
   if (isNaN(price) || price <= 0) {
     return { success: false, error: "Preço inválido." };
+  }
+
+  let resolvedImageUrl = imageUrl;
+  if (!resolvedImageUrl && externalUrl) {
+    resolvedImageUrl = (await extractMercadoLivreImage(externalUrl)) ?? "";
   }
 
   try {
@@ -92,10 +117,21 @@ export async function updateGift(
           $set: {
             name,
             description,
-            imageUrl,
+            imageUrl: resolvedImageUrl,
             price,
             externalUrl,
+            purchaseMode,
             status,
+            buyerType,
+            buyerName,
+            buyerNames,
+            // Clear reservation/claim fields when resetting to available
+            ...(status === "available" && {
+              reservedAt: null,
+              claimedBy: null,
+              claimedAt: null,
+              paymentId: null,
+            }),
             updatedAt: new Date().toISOString(),
           },
         },
