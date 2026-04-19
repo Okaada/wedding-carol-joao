@@ -18,7 +18,7 @@ export default function Hero({ data }: HeroProps) {
         fill
         sizes="100vw"
         priority
-        className="object-cover brightness-50 blur-sm scale-110"
+        className="object-cover object-top brightness-50 blur-sm scale-110"
       />
       <div className="relative z-10 flex flex-col items-center gap-4 px-6 text-center text-white">
         <p className="text-sm tracking-[0.3em] uppercase text-white/80">
