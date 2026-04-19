@@ -174,12 +174,6 @@ export default async function PresentesPage({
       <Navbar />
       <div className="min-h-screen bg-background pt-20">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="mb-4">
-            <Link href="/" className="text-sm text-muted hover:text-primary">
-              &larr; Voltar ao site
-            </Link>
-          </div>
-
           <div className="mb-12 text-center">
             <h1 className="mb-3 font-[family-name:var(--font-playfair)] text-4xl font-bold text-foreground">
               Lista de Presentes
