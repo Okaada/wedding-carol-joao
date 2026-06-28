@@ -1,8 +1,20 @@
 import { getMongoClient } from "@/lib/mongodb";
-import { ObjectId, type Document } from "mongodb";
+import { ObjectId } from "mongodb";
 import type { Purchase } from "@/data/types";
 
-type GiftDoc = Document & { purchases: Purchase[] };
+type GiftDoc = {
+  purchases: Purchase[];
+  singlePurchase?: boolean;
+  status?: "available" | "reserved" | "purchased" | "claimed";
+  buyerType?: string | null;
+  buyerName?: string | null;
+  buyerNames?: string[] | null;
+  claimedBy?: string | null;
+  claimedAt?: string | null;
+  reservedAt?: string | null;
+  paymentId?: string | null;
+  updatedAt?: string;
+};
 
 export async function POST(
   request: Request,

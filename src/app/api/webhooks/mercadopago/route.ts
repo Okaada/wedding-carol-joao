@@ -2,9 +2,15 @@ import { getMongoClient } from "@/lib/mongodb";
 import { getPaymentClient } from "@/lib/mercadopago";
 import { decodeBuyerRef } from "@/lib/external-reference";
 import type { Purchase } from "@/data/types";
-import { ObjectId, type Document } from "mongodb";
+import { ObjectId } from "mongodb";
 
-type GiftDoc = Document & { purchases: Purchase[] };
+type GiftDoc = {
+  purchases: Purchase[];
+  singlePurchase?: boolean;
+  status?: "available" | "reserved" | "purchased" | "claimed";
+  paymentId?: string | null;
+  updatedAt?: string;
+};
 
 export async function POST(request: Request) {
   const body = await request.json();
