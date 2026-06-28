@@ -1,6 +1,8 @@
 import { getMongoClient } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { ObjectId, type Document } from "mongodb";
 import type { Purchase } from "@/data/types";
+
+type GiftDoc = Document & { purchases: Purchase[] };
 
 export async function POST(
   request: Request,
@@ -43,7 +45,7 @@ export async function POST(
   }
 
   const client = await getMongoClient();
-  const collection = client.db("carol-joao").collection("gifts");
+  const collection = client.db("carol-joao").collection<GiftDoc>("gifts");
 
   const gift = await collection.findOne({ _id: objectId });
   if (!gift) {

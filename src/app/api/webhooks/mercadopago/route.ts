@@ -2,7 +2,9 @@ import { getMongoClient } from "@/lib/mongodb";
 import { getPaymentClient } from "@/lib/mercadopago";
 import { decodeBuyerRef } from "@/lib/external-reference";
 import type { Purchase } from "@/data/types";
-import { ObjectId } from "mongodb";
+import { ObjectId, type Document } from "mongodb";
+
+type GiftDoc = Document & { purchases: Purchase[] };
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
   }
 
   const client = await getMongoClient();
-  const collection = client.db("carol-joao").collection("gifts");
+  const collection = client.db("carol-joao").collection<GiftDoc>("gifts");
 
   const gift = await collection.findOne({ _id: objectId });
   if (!gift) {
