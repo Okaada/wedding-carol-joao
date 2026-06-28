@@ -71,7 +71,10 @@ function parseParams(
 function buildMongoFilter(params: ParsedParams): Filter<Gift> {
   const filter: Filter<Gift> = { status: { $ne: "purchased" } };
   if (params.available === "available") {
-    filter.status = "available";
+    filter.$or = [
+      { singlePurchase: { $ne: true } },
+      { status: "available" },
+    ];
   }
   const priceRange: { $gte?: number; $lt?: number } = {};
   switch (params.price) {

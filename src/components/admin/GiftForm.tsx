@@ -13,6 +13,7 @@ interface Props {
     externalUrl?: string;
     status?: string;
     purchaseMode?: string;
+    singlePurchase?: boolean;
     buyerType?: string;
     buyerName?: string;
     buyerNames?: string[];
@@ -108,6 +109,22 @@ export default function GiftForm({ action, defaultValues = {}, showStatus }: Pro
           <option value="mercadopago">Mercado Pago</option>
           <option value="external">Compra externa</option>
         </select>
+      </div>
+
+      <div className="flex items-start gap-2">
+        <input
+          id="singlePurchase"
+          name="singlePurchase"
+          type="checkbox"
+          defaultChecked={defaultValues.singlePurchase ?? false}
+          className="mt-1 h-4 w-4 rounded border-accent text-primary focus:ring-primary"
+        />
+        <label htmlFor="singlePurchase" className="text-sm text-foreground">
+          <span className="font-medium">Compra única?</span>
+          <span className="ml-1 text-muted">
+            Quando marcado, o presente trava após a primeira compra.
+          </span>
+        </label>
       </div>
 
       {showStatus && (

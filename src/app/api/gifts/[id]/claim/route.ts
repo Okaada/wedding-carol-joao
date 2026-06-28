@@ -1,5 +1,6 @@
 import { getMongoClient } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import type { Purchase } from "@/data/types";
 
 export async function POST(
   request: Request,
@@ -42,10 +43,25 @@ export async function POST(
   }
 
   const client = await getMongoClient();
-  const result = await client
-    .db("carol-joao")
-    .collection("gifts")
-    .findOneAndUpdate(
+  const collection = client.db("carol-joao").collection("gifts");
+
+  const gift = await collection.findOne({ _id: objectId });
+  if (!gift) {
+    return Response.json({ error: "Presente não encontrado." }, { status: 404 });
+  }
+
+  const now = new Date().toISOString();
+  const purchase: Purchase = {
+    source: "claim",
+    buyerType: buyerType as Purchase["buyerType"],
+    buyerName,
+    buyerNames: buyerNames ?? [buyerName],
+    paymentId: null,
+    purchasedAt: now,
+  };
+
+  if (gift.singlePurchase === true) {
+    const result = await collection.findOneAndUpdate(
       { _id: objectId, status: "available" },
       {
         $set: {
@@ -54,18 +70,30 @@ export async function POST(
           buyerName,
           buyerNames: buyerNames ?? [buyerName],
           claimedBy: buyerName,
-          claimedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          claimedAt: now,
+          updatedAt: now,
         },
+        $push: { purchases: purchase },
       },
     );
 
-  if (!result) {
-    return Response.json(
-      { error: "Este presente já foi reservado." },
-      { status: 409 },
-    );
+    if (!result) {
+      return Response.json(
+        { error: "Este presente já foi reservado." },
+        { status: 409 },
+      );
+    }
+
+    return Response.json({ success: true });
   }
+
+  await collection.updateOne(
+    { _id: objectId },
+    {
+      $push: { purchases: purchase },
+      $set: { updatedAt: now },
+    },
+  );
 
   return Response.json({ success: true });
 }

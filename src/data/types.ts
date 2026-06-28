@@ -31,6 +31,15 @@ export interface CoupleData {
   weddingDay: WeddingDayData;
 }
 
+export interface Purchase {
+  source: "claim" | "mercadopago";
+  buyerType: "individual" | "couple" | "group";
+  buyerName: string;
+  buyerNames: string[];
+  paymentId: string | null;
+  purchasedAt: string;
+}
+
 export interface Gift {
   _id: string;
   name: string;
@@ -40,6 +49,8 @@ export interface Gift {
   externalUrl: string;
   purchaseMode: "mercadopago" | "external";
   status: "available" | "reserved" | "purchased" | "claimed";
+  singlePurchase: boolean;
+  purchases: Purchase[];
   claimedBy: string | null;
   claimedAt: string | null;
   reservedAt: string | null;

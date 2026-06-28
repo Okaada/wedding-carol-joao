@@ -56,7 +56,29 @@ export default function GiftTable({ gifts }: { gifts: Gift[] }) {
                   <GiftStatusBadge status={gift.status} />
                 </td>
                 <td className="px-4 py-3">
-                  {gift.buyerName ? (
+                  {gift.singlePurchase !== true ? (
+                    (gift.purchases?.length ?? 0) > 0 ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-medium text-muted">
+                          {gift.purchases.length === 1
+                            ? "1 comprador"
+                            : `${gift.purchases.length} compradores`}
+                        </span>
+                        <span className="text-sm text-foreground">
+                          {(() => {
+                            const preview = gift.purchases
+                              .slice(0, 2)
+                              .map((p) => p.buyerName)
+                              .join(", ");
+                            const rest = gift.purchases.length - 2;
+                            return rest > 0 ? `${preview} +${rest} outros` : preview;
+                          })()}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted">—</span>
+                    )
+                  ) : gift.buyerName ? (
                     <div>
                       <span className="text-sm text-foreground">
                         {gift.buyerType === "couple" && gift.buyerNames

@@ -1,5 +1,8 @@
-## ADDED Requirements
+# gift-list-browsing Specification
 
+## Purpose
+TBD - normalized from legacy format. Update Purpose with a short description of this capability.
+## Requirements
 ### Requirement: Filter gifts by price range
 The `/presentes` page SHALL provide a price-range filter control with the buckets `Todos` (default), `Até R$ 100`, `R$ 100–300`, `R$ 300–600`, `Acima de R$ 600`. The selected filter SHALL be encoded in the URL as `?price=<bucket>` and applied server-side to the MongoDB query.
 
@@ -16,15 +19,27 @@ The `/presentes` page SHALL provide a price-range filter control with the bucket
 - **THEN** the URL is updated with the new `price` value and `page` is reset to 1
 
 ### Requirement: Filter gifts by availability
-The `/presentes` page SHALL provide an availability toggle with values `Disponíveis` (default — excludes `purchased`, `reserved`, `claimed`) and `Todos` (only excludes `purchased`). The selection SHALL be encoded as `?available=available|all`.
+The `/presentes` page SHALL provide an availability toggle with values `Disponíveis` (default) and `Todos`. The selection SHALL be encoded as `?available=available|all`.
 
-#### Scenario: Default availability hides claimed/reserved
+When `?available=available`, the server SHALL include every gift that is currently buyable: any gift with `singlePurchase: false` (or the field absent) regardless of past purchases, OR any gift with `singlePurchase: true` and `status: "available"`. It SHALL exclude single-purchase gifts whose `status` is `"reserved"`, `"claimed"`, or `"purchased"`.
+
+When `?available=all`, the server SHALL include all gifts except those with `status: "purchased"`. Multi-purchase gifts SHALL never be `status: "purchased"` at the gift-document level, so this toggle effectively shows them all alongside any reserved/claimed single-purchase gifts (which still render with the locked-card UI).
+
+#### Scenario: Default availability includes multi-purchase gifts even after prior purchases
 - **WHEN** a guest visits `/presentes` without an `available` query param
-- **THEN** only gifts with `status === "available"` appear in the grid
+- **AND** the collection contains a multi-purchase gift whose `purchases[]` already has entries
+- **THEN** that gift appears in the grid as an available "Presentear" card
 
-#### Scenario: "Todos" shows reserved and claimed gifts as locked cards
+#### Scenario: Default availability hides locked single-purchase gifts
+- **WHEN** a guest visits `/presentes` without an `available` query param
+- **AND** a single-purchase gift has `status: "claimed"` or `status: "reserved"`
+- **THEN** that gift is NOT included in the grid
+
+#### Scenario: "Todos" shows locked single-purchase gifts with their reserved/claimed UI
 - **WHEN** a guest selects "Todos" in the availability toggle
-- **THEN** reserved/claimed gifts also render but with the existing locked "Presente reservado" / "Presente sendo pago" UI
+- **AND** a single-purchase gift has `status: "reserved"` or `status: "claimed"`
+- **THEN** that gift renders in the grid with the existing locked "Presente reservado" / "Presente sendo pago" UI
+- **AND** multi-purchase gifts also render (always as available)
 
 ### Requirement: Sort gifts by price or curation
 The `/presentes` page SHALL provide a sort control with options `Padrão` (default, by `sortOrder` ascending), `Menor preço` (by `price` ascending), and `Maior preço` (by `price` descending). The selected sort SHALL be encoded as `?sort=default|price-asc|price-desc`.
@@ -84,3 +99,4 @@ PIX QR-code pre-generation for external-mode gifts (and all gifts under panic mo
 #### Scenario: Page slice limits QR generation
 - **WHEN** the catalog has 30 external-mode gifts and the guest is on page 1 (12 gifts shown)
 - **THEN** at most 12 PIX QR codes are generated for that request, not 30
+

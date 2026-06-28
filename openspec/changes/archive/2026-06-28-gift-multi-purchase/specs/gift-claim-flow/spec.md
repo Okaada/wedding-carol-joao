@@ -1,8 +1,5 @@
-# gift-claim-flow Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - normalized from legacy format. Update Purpose with a short description of this capability.
-## Requirements
 ### Requirement: Guest can claim a gift via external purchase flow
 The system SHALL allow guests to claim a gift without going through Mercado Pago payment. When a gift has `purchaseMode: "external"`, the "Presentear" button SHALL open a claim modal instead of initiating a checkout. The endpoint SHALL append the buyer info to the gift's `purchases[]` array on every successful claim. For gifts with `singlePurchase: true`, the endpoint SHALL also flip `status` to `"claimed"` (legacy behavior). For gifts with `singlePurchase: false`, the endpoint SHALL leave `status` as `"available"` so additional guests can claim the same gift later.
 
@@ -29,56 +26,6 @@ The system SHALL allow guests to claim a gift without going through Mercado Pago
 - **THEN** the system displays an error message "Este presente já foi reservado"
 - **AND** the modal remains open so the guest can close it
 
-### Requirement: Buyer info modal for Mercado Pago gifts
-The system SHALL show a buyer info modal before redirecting to Mercado Pago checkout for gifts with `purchaseMode: "mercadopago"`.
-
-#### Scenario: Guest provides buyer info before Mercado Pago checkout
-- **WHEN** a guest clicks "Presentear" on a gift with `purchaseMode: "mercadopago"`
-- **THEN** the system displays the buyer info modal (name, type, additional names)
-- **AND** after submission, the system sends buyer info with the checkout request
-- **AND** the guest is redirected to Mercado Pago as before
-
-### Requirement: Buyer type selection with dynamic name fields
-The claim modal SHALL adapt its name fields based on the selected buyer type.
-
-#### Scenario: Individual buyer
-- **WHEN** the guest selects "Sozinho(a)" as buyer type
-- **THEN** only a single name field is shown
-
-#### Scenario: Couple buyer
-- **WHEN** the guest selects "Casal" as buyer type
-- **THEN** two name fields are shown (one pre-filled from the primary name)
-
-#### Scenario: Group buyer
-- **WHEN** the guest selects "Grupo" as buyer type
-- **THEN** a dynamic list of name fields is shown with an "Adicionar nome" button to add more
-
-### Requirement: Gift purchase mode configuration
-The system SHALL support a `purchaseMode` field on gifts to determine the checkout behavior.
-
-#### Scenario: Admin creates a gift with external purchase mode
-- **WHEN** an admin creates a gift and selects purchase mode "Compra externa"
-- **THEN** the gift is saved with `purchaseMode: "external"`
-- **AND** guests see the claim modal flow (not Mercado Pago checkout)
-
-#### Scenario: Admin creates a gift with Mercado Pago purchase mode
-- **WHEN** an admin creates a gift and selects purchase mode "Mercado Pago"
-- **THEN** the gift is saved with `purchaseMode: "mercadopago"`
-- **AND** guests see the buyer info modal followed by Mercado Pago redirect
-
-#### Scenario: Default purchase mode for new gifts
-- **WHEN** an admin creates a gift without selecting a purchase mode
-- **THEN** the gift defaults to `purchaseMode: "mercadopago"`
-
-### Requirement: Image-only gifts without external link
-The system SHALL allow gifts that have only an image and description, without requiring an external URL or a price for Mercado Pago.
-
-#### Scenario: Gift with image but no external link
-- **WHEN** a gift has `purchaseMode: "external"` and no `externalUrl`
-- **THEN** the gift card displays the image and description
-- **AND** the "Presentear" button opens the claim modal normally
-- **AND** no "Comprar no MercadoLivre" link is shown
-
 ### Requirement: Claimed gift status display
 The system SHALL display claimed gifts with a distinct visual state, but only for `singlePurchase: true` gifts. Multi-purchase gifts SHALL continue to render the "Presentear" CTA regardless of prior `purchases[]` entries.
 
@@ -91,4 +38,3 @@ The system SHALL display claimed gifts with a distinct visual state, but only fo
 - **WHEN** a gift has `singlePurchase: false` and at least one entry in `purchases[]`
 - **THEN** the gift card still displays the "Presentear" button
 - **AND** no "Presente reservado" / "Presente sendo pago" overlay is rendered
-

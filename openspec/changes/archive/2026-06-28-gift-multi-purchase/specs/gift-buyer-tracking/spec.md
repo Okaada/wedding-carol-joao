@@ -1,8 +1,5 @@
-# gift-buyer-tracking Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - normalized from legacy format. Update Purpose with a short description of this capability.
-## Requirements
 ### Requirement: Gift data model includes buyer information
 The `Gift` interface SHALL track buyer identity for every successful purchase. For `singlePurchase: true` gifts, the gift document SHALL continue to store the legacy single-buyer fields (`buyerType`, `buyerName`, `buyerNames`) on the gift document itself. For `singlePurchase: false` gifts, buyer information SHALL live as entries inside the gift's `purchases[]` array (one entry per claim or approved payment). The legacy single-buyer fields MAY also be populated on multi-purchase gifts (mirroring the most recent buyer), but the `purchases[]` array is the source of truth.
 
@@ -68,13 +65,6 @@ The admin gift edit page SHALL display and allow editing of buyer information. F
 - **WHEN** an admin opens the edit page for a multi-purchase gift with entries in `purchases[]`
 - **THEN** the page renders the list of purchases (buyer name(s), type, source, timestamp) as read-only
 
-### Requirement: Claimed status in admin status badge
-The admin status badge component SHALL support the `"claimed"` status.
-
-#### Scenario: Claimed status badge display
-- **WHEN** a gift has status `"claimed"`
-- **THEN** the badge displays "Reservado" with a distinct color (blue)
-
 ### Requirement: Admin gift stats include claimed count
 The admin dashboard stats SHALL include claimed gifts in the count. The "Comprados" stat SHALL include both legacy `status === "purchased"` gifts and the total number of entries summed across every gift's `purchases[]` array, so multi-purchase contributions are reflected in the dashboard total.
 
@@ -85,4 +75,3 @@ The admin dashboard stats SHALL include claimed gifts in the count. The "Comprad
 #### Scenario: Multi-purchase entries are counted in "Comprados"
 - **WHEN** the collection contains 2 single-purchase gifts with `status: "purchased"` and 3 multi-purchase gifts whose `purchases[]` arrays contain 4, 1, and 2 entries respectively
 - **THEN** the "Comprados" stat displays 9 (2 legacy purchased + 4 + 1 + 2 = 9)
-

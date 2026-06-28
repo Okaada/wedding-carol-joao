@@ -10,7 +10,9 @@
       "Bash(npm install:*)",
       "Bash(cat:*)",
       "Bash(npx tsx:*)",
-      "Bash(openspec list-specs *)"
+      "Bash(openspec list-specs *)",
+      "Bash(npm run *)",
+      "Bash(openspec archive *)"
     ]
   }
 }

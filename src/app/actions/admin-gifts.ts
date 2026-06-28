@@ -25,6 +25,7 @@ export async function createGift(
   const priceStr = (formData.get("price") as string)?.trim();
   const externalUrl = (formData.get("externalUrl") as string)?.trim() ?? "";
   const purchaseMode = (formData.get("purchaseMode") as string) ?? "mercadopago";
+  const singlePurchase = formData.get("singlePurchase") === "on";
 
   if (!name) return { success: false, error: "Nome é obrigatório." };
   if (!priceStr) return { success: false, error: "Preço é obrigatório." };
@@ -51,6 +52,8 @@ export async function createGift(
       price,
       externalUrl,
       purchaseMode,
+      singlePurchase,
+      purchases: [],
       status: "available",
       claimedBy: null,
       claimedAt: null,
@@ -86,6 +89,7 @@ export async function updateGift(
   const externalUrl = (formData.get("externalUrl") as string)?.trim() ?? "";
   const status = (formData.get("status") as string) ?? "available";
   const purchaseMode = (formData.get("purchaseMode") as string) ?? "mercadopago";
+  const singlePurchase = formData.get("singlePurchase") === "on";
   const buyerType = (formData.get("buyerType") as string) || null;
   const buyerName = (formData.get("buyerName") as string)?.trim() || null;
   const buyerNamesRaw = (formData.get("buyerNames") as string)?.trim() || null;
@@ -121,6 +125,7 @@ export async function updateGift(
             price,
             externalUrl,
             purchaseMode,
+            singlePurchase,
             status,
             buyerType,
             buyerName,

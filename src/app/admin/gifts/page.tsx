@@ -14,7 +14,9 @@ export default async function GiftsPage() {
   const available = gifts.filter((g) => g.status === "available").length;
   const reserved = gifts.filter((g) => g.status === "reserved").length;
   const claimed = gifts.filter((g) => g.status === "claimed").length;
-  const purchased = gifts.filter((g) => g.status === "purchased").length;
+  const purchased =
+    gifts.filter((g) => g.status === "purchased").length +
+    gifts.reduce((acc, g) => acc + (g.purchases?.length ?? 0), 0);
 
   return (
     <div>

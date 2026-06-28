@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:gifts-multi-purchase": "node --import tsx scripts/migrate-gifts-multi-purchase.ts"
   },
   "dependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.2.2",

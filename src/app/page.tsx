@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Timeline from "@/components/Timeline";
 import PhotoGallery from "@/components/PhotoGallery";
-import RsvpForm from "@/components/RsvpForm";
+import RsvpWhatsappCta from "@/components/RsvpWhatsappCta";
 import { coupleData } from "@/data/couple";
 
 export default function Home() {
@@ -21,9 +21,11 @@ export default function Home() {
               Confirmar Presença
             </h2>
             <p className="mb-10 text-center text-sm text-muted">
-              Confirme sua presença até 15 de outubro de 2026.
+              Clique no botão abaixo para confirmar sua presença com a gente pelo WhatsApp até 15 de outubro de 2026.
             </p>
-            <RsvpForm />
+            <div className="flex justify-center">
+              <RsvpWhatsappCta />
+            </div>
           </div>
         </section>
       </main>

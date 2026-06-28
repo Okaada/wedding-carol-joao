@@ -19,7 +19,8 @@ export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: 
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const isAvailable = status === "available";
+  const multiPurchase = gift.singlePurchase !== true;
+  const isAvailable = multiPurchase || status === "available";
   const purchaseMode = gift.purchaseMode ?? "mercadopago";
 
   async function handleClaim(buyerInfo: BuyerInfo) {
@@ -34,12 +35,12 @@ export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: 
       });
 
       if (res.ok) {
-        setStatus("claimed");
+        if (!multiPurchase) setStatus("claimed");
         setShowModal(false);
       } else {
         const data = await res.json();
         setError(data.error || "Erro ao reservar presente.");
-        if (res.status === 409) setStatus("reserved");
+        if (res.status === 409 && !multiPurchase) setStatus("reserved");
       }
     } catch {
       setError("Erro de conexão. Tente novamente.");
@@ -65,7 +66,7 @@ export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: 
       } else {
         const data = await res.json();
         setError(data.error || "Erro ao iniciar pagamento.");
-        if (res.status === 409) setStatus("reserved");
+        if (res.status === 409 && !multiPurchase) setStatus("reserved");
         setLoading(false);
         setShowModal(false);
       }
