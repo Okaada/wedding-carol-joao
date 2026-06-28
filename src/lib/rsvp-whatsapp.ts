@@ -1,5 +1,5 @@
 export const RSVP_WHATSAPP_MESSAGE =
-  "Olá! Gostaria de confirmar minha presença no casamento da Carol e do João. 💍";
+  "Olá! Tudo bem? Gostaria de confirmar minha presença no casamento da Carol e do João.";
 
 function buildRsvpWhatsappUrl(): string {
   const raw = process.env.NEXT_PUBLIC_RSVP_WHATSAPP;
