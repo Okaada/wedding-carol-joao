@@ -94,17 +94,6 @@ export default function ClaimModal({
         </h3>
         <p className="mb-4 text-sm text-muted">{giftName}</p>
 
-        {externalUrl && mode === "external" && (
-          <a
-            href={externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mb-4 block rounded-lg border border-primary px-4 py-2 text-center text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
-          >
-            Ver no MercadoLivre
-          </a>
-        )}
-
         {pixQrCodeUrl && mode === "external" && (
           <div className="mb-4 rounded-lg border border-accent bg-section-alt p-4 text-center">
             <p className="mb-2 text-sm font-medium text-foreground">
