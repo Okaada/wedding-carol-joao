@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
 import ClaimModal from "@/components/ClaimModal";
-import type { Gift, BuyerInfo } from "@/data/types";
+import type { PublicGift, BuyerInfo } from "@/data/types";
 
 interface GiftCardProps {
-  gift: Gift;
+  gift: PublicGift;
   pixQrCodeUrl?: string;
   pixPayload?: string;
 }

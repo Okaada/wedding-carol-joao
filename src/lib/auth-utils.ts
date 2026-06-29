@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { getMongoClient } from "./mongodb";
 
 const DB_NAME = "carol-joao";
@@ -43,6 +44,10 @@ export async function ensureSecurityIndexes(): Promise<void> {
     db
       .collection("auth_states")
       .createIndex({ createdAt: 1 }, { expireAfterSeconds: 10 * 60 }),
+    db
+      .collection("write_rate_limits")
+      .createIndex({ firstHit: 1 }, { expireAfterSeconds: 10 * 60 }),
+    db.collection("write_rate_limits").createIndex({ key: 1 }, { unique: true }),
   ]);
 
   indexesEnsured = true;
@@ -52,44 +57,69 @@ export async function ensureSecurityIndexes(): Promise<void> {
 const MAX_ATTEMPTS = 5;
 
 export async function checkRateLimit(
-  email: string,
+  _email: string,
+  ip: string,
 ): Promise<{ locked: boolean }> {
-  const normalized = normalizeEmail(email);
+  // Lock only when the originating IP itself is over the threshold. This
+  // preserves brute-force protection but prevents a third party from locking
+  // a real user out by hammering only their email from foreign IPs.
   const client = await getMongoClient();
-  const doc = await client
+  const ipDoc = await client
     .db(DB_NAME)
     .collection("login_attempts")
-    .findOne({ email: normalized });
+    .findOne({ ip });
 
-  if (doc && (doc.count as number) >= MAX_ATTEMPTS) {
+  if (ipDoc && (ipDoc.count as number) >= MAX_ATTEMPTS) {
     return { locked: true };
   }
   return { locked: false };
 }
 
-export async function recordFailedAttempt(email: string): Promise<void> {
+export async function recordFailedAttempt(
+  email: string,
+  ip: string,
+): Promise<void> {
   const normalized = normalizeEmail(email);
   const client = await getMongoClient();
-  await client
-    .db(DB_NAME)
-    .collection("login_attempts")
-    .updateOne(
+  const col = client.db(DB_NAME).collection("login_attempts");
+
+  await Promise.all([
+    col.updateOne(
       { email: normalized },
-      {
-        $inc: { count: 1 },
-        $setOnInsert: { firstAttempt: new Date() },
-      },
+      { $inc: { count: 1 }, $setOnInsert: { firstAttempt: new Date() } },
       { upsert: true },
-    );
+    ),
+    col.updateOne(
+      { ip },
+      { $inc: { count: 1 }, $setOnInsert: { firstAttempt: new Date() } },
+      { upsert: true },
+    ),
+  ]);
 }
 
-export async function clearAttempts(email: string): Promise<void> {
+export async function clearAttempts(
+  email: string,
+  ip?: string,
+): Promise<void> {
   const normalized = normalizeEmail(email);
   const client = await getMongoClient();
-  await client
-    .db(DB_NAME)
-    .collection("login_attempts")
-    .deleteOne({ email: normalized });
+  const col = client.db(DB_NAME).collection("login_attempts");
+  await col.deleteOne({ email: normalized });
+  if (ip) await col.deleteOne({ ip });
+}
+
+// Generated lazily so the unknown-email login path can run a real bcrypt
+// comparison and match the timing of the valid-email path.
+let dummyHash: string | null = null;
+
+export async function dummyBcryptCompare(password: string): Promise<void> {
+  if (!dummyHash) {
+    dummyHash = await bcrypt.hash(
+      "dummy-password-for-timing-equalization",
+      10,
+    );
+  }
+  await bcrypt.compare(password, dummyHash);
 }
 
 // ─── Audit logging ─────────────────────────────────────────────────

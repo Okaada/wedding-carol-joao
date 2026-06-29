@@ -14,7 +14,10 @@
       "Bash(npm run *)",
       "Bash(openspec archive *)",
       "Bash(NEXT_PUBLIC_RSVP_WHATSAPP=+5511999999999 npm run build)",
-      "Bash(python3 -c 'import sys, json; d=json.load\\(sys.stdin\\); print\\(f\"applyReady: {d[\\\\\"isComplete\\\\\"]}\"\\)')"
+      "Bash(python3 -c 'import sys, json; d=json.load\\(sys.stdin\\); print\\(f\"applyReady: {d[\\\\\"isComplete\\\\\"]}\"\\)')",
+      "Bash(awk 'NR==3' openspec/specs/login-rate-limiting/spec.md)",
+      "Bash(awk 'NR==3' openspec/changes/harden-export-headers-auth/specs/login-rate-limiting/spec.md)",
+      "Bash(openspec validate *)"
     ]
   }
 }

@@ -4,11 +4,45 @@ import { getMercadopagoPaymentLink } from "@/lib/settings";
 import { createPendingPayment } from "@/lib/pending-payments";
 import type { BuyerInfo } from "@/data/types";
 import { ObjectId } from "mongodb";
+import { ensureSecurityIndexes } from "@/lib/auth-utils";
+import {
+  checkRate,
+  countActiveReservationsByIp,
+  getClientIp,
+} from "@/lib/rate-limit";
+
+const MAX_BUYER_NAMES = 20;
+const MAX_NAME_LENGTH = 80;
+const MAX_BODY_BYTES = 8 * 1024;
+const RATE_MAX = 10;
+const RATE_WINDOW_SECONDS = 10 * 60;
+const RESERVATION_WINDOW_SECONDS = 30 * 60;
+const MAX_ACTIVE_RESERVATIONS_PER_IP = 5;
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await ensureSecurityIndexes();
+
+  const ip = getClientIp(request);
+  const rate = await checkRate({
+    key: `${ip}:checkout`,
+    max: RATE_MAX,
+    windowSeconds: RATE_WINDOW_SECONDS,
+  });
+  if (!rate.allowed) {
+    return Response.json(
+      { error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." },
+      { status: 429 },
+    );
+  }
+
+  const contentLength = Number(request.headers.get("content-length") ?? "0");
+  if (contentLength > MAX_BODY_BYTES) {
+    return Response.json({ error: "Requisição muito grande." }, { status: 400 });
+  }
+
   const { id } = await params;
 
   let buyerName: string | null = null;
@@ -21,6 +55,21 @@ export async function POST(
     buyerNames = body.buyerNames || null;
   } catch {
     // Body is optional for backwards compatibility
+  }
+
+  if (buyerName && buyerName.length > MAX_NAME_LENGTH) {
+    return Response.json({ error: "Nome muito longo." }, { status: 400 });
+  }
+  if (buyerNames !== null) {
+    if (!Array.isArray(buyerNames)) {
+      return Response.json({ error: "Lista de nomes inválida." }, { status: 400 });
+    }
+    if (buyerNames.length > MAX_BUYER_NAMES) {
+      return Response.json({ error: "Muitos nomes informados." }, { status: 400 });
+    }
+    if (buyerNames.some((n) => typeof n !== "string" || n.length > MAX_NAME_LENGTH)) {
+      return Response.json({ error: "Algum nome é inválido." }, { status: 400 });
+    }
   }
 
   let objectId: ObjectId;
@@ -50,6 +99,22 @@ export async function POST(
       : null;
 
   if (gift.singlePurchase === true) {
+    if (ip !== "unknown") {
+      const active = await countActiveReservationsByIp(
+        ip,
+        RESERVATION_WINDOW_SECONDS,
+      );
+      if (active >= MAX_ACTIVE_RESERVATIONS_PER_IP) {
+        return Response.json(
+          {
+            error:
+              "Você já tem reservas em aberto. Conclua o pagamento antes de reservar outro presente.",
+          },
+          { status: 429 },
+        );
+      }
+    }
+
     const reservation = await collection.findOneAndUpdate(
       { _id: objectId, status: "available" },
       {
@@ -85,6 +150,7 @@ export async function POST(
       buyerNames: [],
     },
     amount,
+    ip,
   });
 
   const paymentLinkUrl = await getMercadopagoPaymentLink();

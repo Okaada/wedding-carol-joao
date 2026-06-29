@@ -76,6 +76,39 @@ export interface Gift {
   updatedAt: string;
 }
 
+export type PublicGift = Pick<
+  Gift,
+  | "_id"
+  | "name"
+  | "description"
+  | "imageUrl"
+  | "price"
+  | "externalUrl"
+  | "purchaseMode"
+  | "singlePurchase"
+  | "status"
+  | "sortOrder"
+>;
+
+type PublicGiftSource = Omit<PublicGift, "_id"> & {
+  _id: string | { toString(): string };
+};
+
+export function toPublicGift(d: PublicGiftSource): PublicGift {
+  return {
+    _id: typeof d._id === "string" ? d._id : d._id.toString(),
+    name: d.name,
+    description: d.description,
+    imageUrl: d.imageUrl,
+    price: d.price,
+    externalUrl: d.externalUrl,
+    purchaseMode: d.purchaseMode,
+    singlePurchase: d.singlePurchase,
+    status: d.status,
+    sortOrder: d.sortOrder,
+  };
+}
+
 export interface PixSettings {
   keyType: "cpf" | "email" | "phone" | "random";
   keyValue: string;

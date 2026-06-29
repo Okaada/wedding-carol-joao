@@ -1,8 +1,5 @@
-# login-rate-limiting Specification
+## MODIFIED Requirements
 
-## Purpose
-Protect admin login from brute-force and account-lockout abuse using MongoDB-backed counters and TTL expiry.
-## Requirements
 ### Requirement: Rate limit failed login attempts
 The system SHALL track failed login attempts in a MongoDB `login_attempts` collection, keyed by BOTH normalized email AND client IP. After 5 failed attempts within a 15-minute window, the system SHALL reject further login attempts with a lockout message ("Muitas tentativas de login. Tente novamente em 15 minutos.") without checking the password. To prevent a third party from locking a legitimate user out by targeting their email alone, the system SHALL NOT lock a login attempt solely because the email counter is high when the request originates from an IP that has not itself exceeded the threshold; brute-force traffic concentrated on a single IP SHALL still be throttled.
 
@@ -38,15 +35,3 @@ The system SHALL normalize the email address (lowercase, trimmed) before checkin
 - **WHEN** a login is attempted with an email that has no matching admin user
 - **THEN** the system performs a dummy password comparison so the response time is comparable to a valid email with an incorrect password
 - **AND** the error returned is the standard "Email ou senha incorretos" message
-
-### Requirement: Password policy enforcement
-The system SHALL enforce that admin passwords are at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit. This validation SHALL apply to `createAdminUser` and any password update operations.
-
-#### Scenario: Weak password rejected on user creation
-- **WHEN** an admin creates a new user with password "abc123"
-- **THEN** the system rejects the request with "A senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula e número."
-
-#### Scenario: Strong password accepted
-- **WHEN** an admin creates a new user with password "SecurePass1"
-- **THEN** the system accepts the password and proceeds with user creation
-

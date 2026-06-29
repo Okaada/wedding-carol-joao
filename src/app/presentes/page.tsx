@@ -8,7 +8,8 @@ import Navbar from "@/components/Navbar";
 import Pagination from "@/components/Pagination";
 import GiftListControls from "@/components/gifts/GiftListControls";
 import PixSection from "@/components/PixSection";
-import type { Gift, PixSettings } from "@/data/types";
+import { toPublicGift } from "@/data/types";
+import type { Gift, PublicGift, PixSettings } from "@/data/types";
 
 export const dynamic = "force-dynamic";
 
@@ -141,11 +142,21 @@ export default async function PresentesPage({
 
   const docs = await collection
     .find(filter)
+    .project<Gift>({
+      purchases: 0,
+      buyerName: 0,
+      buyerNames: 0,
+      buyerType: 0,
+      claimedBy: 0,
+      claimedAt: 0,
+      paymentId: 0,
+      reservedAt: 0,
+    })
     .sort(sort)
     .skip((currentPage - 1) * PAGE_SIZE)
     .limit(PAGE_SIZE)
     .toArray();
-  const gifts = docs.map((d) => ({ ...d, _id: d._id.toString() })) as Gift[];
+  const gifts: PublicGift[] = docs.map(toPublicGift);
 
   const pixDoc = await db.collection("settings").findOne({ key: "pix" });
   const pixSettings = pixDoc?.value as PixSettings | undefined;

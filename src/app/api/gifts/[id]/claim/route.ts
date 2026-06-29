@@ -1,6 +1,8 @@
 import { getMongoClient } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import type { Purchase } from "@/data/types";
+import { ensureSecurityIndexes } from "@/lib/auth-utils";
+import { checkRate, getClientIp } from "@/lib/rate-limit";
 
 type GiftDoc = {
   purchases: Purchase[];
@@ -16,10 +18,36 @@ type GiftDoc = {
   updatedAt?: string;
 };
 
+const MAX_BUYER_NAMES = 20;
+const MAX_NAME_LENGTH = 80;
+const MAX_BODY_BYTES = 8 * 1024;
+const RATE_MAX = 10;
+const RATE_WINDOW_SECONDS = 10 * 60;
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await ensureSecurityIndexes();
+
+  const ip = getClientIp(request);
+  const rate = await checkRate({
+    key: `${ip}:claim`,
+    max: RATE_MAX,
+    windowSeconds: RATE_WINDOW_SECONDS,
+  });
+  if (!rate.allowed) {
+    return Response.json(
+      { error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." },
+      { status: 429 },
+    );
+  }
+
+  const contentLength = Number(request.headers.get("content-length") ?? "0");
+  if (contentLength > MAX_BODY_BYTES) {
+    return Response.json({ error: "Requisição muito grande." }, { status: 400 });
+  }
+
   const { id } = await params;
   const body = await request.json();
 
@@ -31,8 +59,24 @@ export async function POST(
     return Response.json({ error: "Nome é obrigatório." }, { status: 400 });
   }
 
+  if (buyerName.length > MAX_NAME_LENGTH) {
+    return Response.json({ error: "Nome muito longo." }, { status: 400 });
+  }
+
   if (!["individual", "couple", "group"].includes(buyerType)) {
     return Response.json({ error: "Tipo de comprador inválido." }, { status: 400 });
+  }
+
+  if (buyerNames !== undefined) {
+    if (!Array.isArray(buyerNames)) {
+      return Response.json({ error: "Lista de nomes inválida." }, { status: 400 });
+    }
+    if (buyerNames.length > MAX_BUYER_NAMES) {
+      return Response.json({ error: "Muitos nomes informados." }, { status: 400 });
+    }
+    if (buyerNames.some((n) => typeof n !== "string" || n.length > MAX_NAME_LENGTH)) {
+      return Response.json({ error: "Algum nome é inválido." }, { status: 400 });
+    }
   }
 
   if (buyerType === "couple" && (!buyerNames || buyerNames.length < 2)) {

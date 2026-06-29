@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "migrate:gifts-multi-purchase": "node --import tsx scripts/migrate-gifts-multi-purchase.ts",
-    "migrate:pending-payments-indexes": "node --import tsx scripts/migrate-pending-payments-indexes.ts"
+    "migrate:pending-payments-indexes": "node --import tsx scripts/migrate-pending-payments-indexes.ts",
+    "check:public-gift-payload": "node --import tsx scripts/check-public-gift-payload.ts"
   },
   "dependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.2.2",

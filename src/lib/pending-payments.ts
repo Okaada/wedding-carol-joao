@@ -20,6 +20,7 @@ type PendingDoc = {
   createdAt: string;
   confirmedAt?: string | null;
   cancelledAt?: string | null;
+  ip?: string;
 };
 
 export interface PendingPaymentRow {
@@ -36,10 +37,12 @@ export async function createPendingPayment({
   giftId,
   buyerInfo,
   amount,
+  ip,
 }: {
   giftId: string;
   buyerInfo: BuyerInfo;
   amount: number;
+  ip?: string;
 }): Promise<string> {
   const client = await getMongoClient();
   const result = await client
@@ -51,6 +54,7 @@ export async function createPendingPayment({
       amount,
       status: "pending",
       createdAt: new Date().toISOString(),
+      ...(ip ? { ip } : {}),
     });
   return result.insertedId.toString();
 }
