@@ -40,6 +40,19 @@ export interface Purchase {
   purchasedAt: string;
 }
 
+export type BuyerInfo = Pick<Purchase, "buyerType" | "buyerName" | "buyerNames">;
+
+export interface PendingPayment {
+  _id: string;
+  giftId: string;
+  buyerInfo: BuyerInfo;
+  amount: number;
+  status: "pending" | "confirmed" | "cancelled";
+  createdAt: string;
+  confirmedAt?: string | null;
+  cancelledAt?: string | null;
+}
+
 export interface Gift {
   _id: string;
   name: string;

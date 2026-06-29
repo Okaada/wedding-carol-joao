@@ -6,9 +6,18 @@ import { revalidatePath } from "next/cache";
 
 export type SettingsResult = { success: boolean; error?: string };
 
-export async function togglePanicMode(enable: boolean): Promise<SettingsResult> {
+const MERCADOPAGO_LINK_PREFIX = "https://link.mercadopago.com.br/";
+
+export async function setMercadopagoPaymentLink(
+  url: string,
+): Promise<SettingsResult> {
   const session = await auth();
   if (!session) return { success: false, error: "Não autorizado." };
+
+  const trimmed = url.trim();
+  if (!trimmed || !trimmed.startsWith(MERCADOPAGO_LINK_PREFIX)) {
+    return { success: false, error: "Informe uma URL válida." };
+  }
 
   try {
     const client = await getMongoClient();
@@ -16,14 +25,11 @@ export async function togglePanicMode(enable: boolean): Promise<SettingsResult> 
       .db("carol-joao")
       .collection("settings")
       .updateOne(
-        { key: "panic_mode" },
+        { key: "mercadopago_payment_link" },
         {
           $set: {
-            key: "panic_mode",
-            value: {
-              enabled: enable,
-              enabledAt: enable ? new Date().toISOString() : null,
-            },
+            key: "mercadopago_payment_link",
+            value: { url: trimmed, updatedAt: new Date().toISOString() },
             updatedAt: new Date().toISOString(),
           },
         },
@@ -34,7 +40,7 @@ export async function togglePanicMode(enable: boolean): Promise<SettingsResult> 
     revalidatePath("/presentes");
     return { success: true };
   } catch {
-    return { success: false, error: "Erro ao alterar modo de emergência." };
+    return { success: false, error: "Erro ao salvar o link de pagamento." };
   }
 }
 

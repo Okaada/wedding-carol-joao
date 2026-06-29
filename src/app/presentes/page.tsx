@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Filter, Sort } from "mongodb";
 import { getMongoClient } from "@/lib/mongodb";
 import { releaseExpiredReservations } from "@/lib/gifts";
-import { isPanicModeActive } from "@/lib/panic-mode";
 import { generatePixQrCodeDataUrl, generatePixPayload } from "@/lib/pix";
 import GiftCard from "@/components/GiftCard";
 import Navbar from "@/components/Navbar";
@@ -150,16 +149,12 @@ export default async function PresentesPage({
 
   const pixDoc = await db.collection("settings").findOne({ key: "pix" });
   const pixSettings = pixDoc?.value as PixSettings | undefined;
-  const panicMode = await isPanicModeActive();
 
   const pixDataMap: Record<string, { qrCodeUrl: string; payload: string }> = {};
   if (pixSettings) {
     for (const gift of gifts) {
       const mode = gift.purchaseMode ?? "mercadopago";
-      const needsPix =
-        (mode === "external" && gift.price > 0) ||
-        (panicMode && gift.price > 0);
-      if (needsPix) {
+      if (mode === "external" && gift.price > 0) {
         const amountBrl = gift.price / 100;
         const [qrCodeUrl, payload] = await Promise.all([
           generatePixQrCodeDataUrl(pixSettings, amountBrl),
@@ -210,7 +205,6 @@ export default async function PresentesPage({
                     gift={gift}
                     pixQrCodeUrl={pixDataMap[gift._id]?.qrCodeUrl}
                     pixPayload={pixDataMap[gift._id]?.payload}
-                    panicMode={panicMode}
                   />
                 ))}
               </div>

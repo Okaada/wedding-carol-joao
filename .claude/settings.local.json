@@ -12,7 +12,9 @@
       "Bash(npx tsx:*)",
       "Bash(openspec list-specs *)",
       "Bash(npm run *)",
-      "Bash(openspec archive *)"
+      "Bash(openspec archive *)",
+      "Bash(NEXT_PUBLIC_RSVP_WHATSAPP=+5511999999999 npm run build)",
+      "Bash(python3 -c 'import sys, json; d=json.load\\(sys.stdin\\); print\\(f\"applyReady: {d[\\\\\"isComplete\\\\\"]}\"\\)')"
     ]
   }
 }

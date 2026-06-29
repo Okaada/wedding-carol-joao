@@ -3,17 +3,15 @@
 import { useState } from "react";
 import { formatPrice } from "@/lib/format";
 import ClaimModal from "@/components/ClaimModal";
-import type { Gift } from "@/data/types";
-import type { BuyerInfo } from "@/components/ClaimModal";
+import type { Gift, BuyerInfo } from "@/data/types";
 
 interface GiftCardProps {
   gift: Gift;
   pixQrCodeUrl?: string;
   pixPayload?: string;
-  panicMode?: boolean;
 }
 
-export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: GiftCardProps) {
+export default function GiftCard({ gift, pixQrCodeUrl, pixPayload }: GiftCardProps) {
   const [status, setStatus] = useState(gift.status);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,42 +47,14 @@ export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: 
     }
   }
 
-  async function handleCheckoutWithBuyer(buyerInfo: BuyerInfo) {
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch(`/api/gifts/${gift._id}/checkout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buyerInfo),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        window.location.href = data.checkoutUrl;
-      } else {
-        const data = await res.json();
-        setError(data.error || "Erro ao iniciar pagamento.");
-        if (res.status === 409 && !multiPurchase) setStatus("reserved");
-        setLoading(false);
-        setShowModal(false);
-      }
-    } catch {
-      setError("Erro de conexão. Tente novamente.");
-      setLoading(false);
-      setShowModal(false);
+  function handleConfirm(buyerInfo: BuyerInfo) {
+    if (purchaseMode === "external") {
+      handleClaim(buyerInfo);
     }
   }
 
-  const usePixFallback = panicMode && purchaseMode === "mercadopago";
-
-  function handleConfirm(buyerInfo: BuyerInfo) {
-    if (purchaseMode === "external" || usePixFallback) {
-      handleClaim(buyerInfo);
-    } else {
-      handleCheckoutWithBuyer(buyerInfo);
-    }
+  function handleReserved() {
+    if (!multiPurchase) setStatus("reserved");
   }
 
   return (
@@ -146,11 +116,12 @@ export default function GiftCard({ gift, pixQrCodeUrl, pixPayload, panicMode }: 
           giftId={gift._id}
           giftName={gift.name}
           externalUrl={gift.externalUrl}
-          mode={usePixFallback ? "external" : purchaseMode}
+          mode={purchaseMode}
           pixQrCodeUrl={pixQrCodeUrl}
           pixPayload={pixPayload}
           onClose={() => setShowModal(false)}
           onConfirm={handleConfirm}
+          onReserved={handleReserved}
         />
       )}
     </>
