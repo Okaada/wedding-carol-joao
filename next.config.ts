@@ -7,6 +7,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   "connect-src 'self'",
+  "frame-src https://www.google.com https://maps.google.com",
   "form-action 'self' https://link.mercadopago.com.br https://www.mercadopago.com.br",
   "frame-ancestors 'none'",
   "base-uri 'self'",
