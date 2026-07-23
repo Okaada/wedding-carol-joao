@@ -21,6 +21,7 @@ type PendingDoc = {
   confirmedAt?: string | null;
   cancelledAt?: string | null;
   ip?: string;
+  mpPreferenceId?: string;
 };
 
 export interface PendingPaymentRow {
@@ -57,6 +58,28 @@ export async function createPendingPayment({
       ...(ip ? { ip } : {}),
     });
   return result.insertedId.toString();
+}
+
+/** Records the Mercado Pago Preference id created for a Checkout Pro attempt. */
+export async function attachMpPreference(
+  pendingId: string,
+  preferenceId: string,
+): Promise<void> {
+  let pendingObjectId: ObjectId;
+  try {
+    pendingObjectId = new ObjectId(pendingId);
+  } catch {
+    return;
+  }
+
+  const client = await getMongoClient();
+  await client
+    .db("carol-joao")
+    .collection<PendingDoc>("pending_payments")
+    .updateOne(
+      { _id: pendingObjectId },
+      { $set: { mpPreferenceId: preferenceId } },
+    );
 }
 
 export async function listPendingPayments(): Promise<PendingPaymentRow[]> {
@@ -105,7 +128,10 @@ export async function listPendingPayments(): Promise<PendingPaymentRow[]> {
   });
 }
 
-export async function confirmPendingPayment(pendingId: string): Promise<{
+export async function confirmPendingPayment(
+  pendingId: string,
+  opts?: { paymentId?: string },
+): Promise<{
   success: boolean;
   error?: string;
 }> {
@@ -126,6 +152,8 @@ export async function confirmPendingPayment(pendingId: string): Promise<{
     status: "pending",
   });
   if (!pending) {
+    // Already confirmed/cancelled (or unknown id) — treat as a no-op success
+    // so webhook retries and double-clicks are idempotent rather than errors.
     return { success: false, error: "Pagamento pendente não encontrado." };
   }
 
@@ -142,6 +170,7 @@ export async function confirmPendingPayment(pendingId: string): Promise<{
   }
 
   const now = new Date().toISOString();
+  const paymentId = opts?.paymentId ?? null;
 
   if (gift.singlePurchase === true) {
     await giftsCol.findOneAndUpdate(
@@ -149,7 +178,7 @@ export async function confirmPendingPayment(pendingId: string): Promise<{
       {
         $set: {
           status: "purchased",
-          paymentId: null,
+          paymentId,
           updatedAt: now,
         },
       },
@@ -160,7 +189,7 @@ export async function confirmPendingPayment(pendingId: string): Promise<{
       buyerType: pending.buyerInfo.buyerType,
       buyerName: pending.buyerInfo.buyerName,
       buyerNames: pending.buyerInfo.buyerNames,
-      paymentId: null,
+      paymentId,
       purchasedAt: now,
     };
     await giftsCol.updateOne(

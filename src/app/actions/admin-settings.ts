@@ -44,6 +44,37 @@ export async function setMercadopagoPaymentLink(
   }
 }
 
+export async function setMercadopagoCheckoutProEnabled(
+  enabled: boolean,
+): Promise<SettingsResult> {
+  const session = await auth();
+  if (!session) return { success: false, error: "Não autorizado." };
+
+  try {
+    const client = await getMongoClient();
+    await client
+      .db("carol-joao")
+      .collection("settings")
+      .updateOne(
+        { key: "mercadopago_checkout_pro" },
+        {
+          $set: {
+            key: "mercadopago_checkout_pro",
+            value: { enabled, updatedAt: new Date().toISOString() },
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        { upsert: true },
+      );
+
+    revalidatePath("/admin/settings");
+    revalidatePath("/presentes");
+    return { success: true };
+  } catch {
+    return { success: false, error: "Erro ao salvar a configuração." };
+  }
+}
+
 export async function savePixSettings(
   _prev: SettingsResult,
   formData: FormData,

@@ -1,7 +1,14 @@
 import { getMongoClient } from "@/lib/mongodb";
 import { releaseExpiredReservations } from "@/lib/gifts";
-import { getMercadopagoPaymentLink } from "@/lib/settings";
-import { createPendingPayment } from "@/lib/pending-payments";
+import {
+  getMercadopagoCheckoutProEnabled,
+  getMercadopagoPaymentLink,
+} from "@/lib/settings";
+import {
+  attachMpPreference,
+  createPendingPayment,
+} from "@/lib/pending-payments";
+import { getPreferenceClient, isMercadopagoConfigured } from "@/lib/mercadopago";
 import type { BuyerInfo } from "@/data/types";
 import { ObjectId } from "mongodb";
 import { ensureSecurityIndexes } from "@/lib/auth-utils";
@@ -10,6 +17,71 @@ import {
   countActiveReservationsByIp,
   getClientIp,
 } from "@/lib/rate-limit";
+
+/**
+ * Attempts a Mercado Pago Checkout Pro Preference for this pending payment.
+ * Returns the init_point URL on success, or null on ANY failure — the caller
+ * always has the open-link response as a safe fallback. Never throws.
+ */
+async function tryCreateCheckoutProPreference({
+  pendingId,
+  giftId,
+  giftName,
+  amount,
+}: {
+  pendingId: string;
+  giftId: string;
+  giftName: string;
+  amount: number;
+}): Promise<string | null> {
+  try {
+    const enabled = await getMercadopagoCheckoutProEnabled();
+    if (!enabled || !isMercadopagoConfigured()) return null;
+
+    const preferenceClient = getPreferenceClient();
+    if (!preferenceClient) return null;
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+    const preference = await preferenceClient.create({
+      body: {
+        items: [
+          {
+            id: giftId,
+            title: giftName,
+            quantity: 1,
+            unit_price: amount,
+            currency_id: "BRL",
+          },
+        ],
+        external_reference: pendingId,
+        ...(baseUrl && {
+          notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+          back_urls: {
+            success: `${baseUrl}/presentes/obrigado`,
+            failure: `${baseUrl}/presentes`,
+            pending: `${baseUrl}/presentes`,
+          },
+          auto_return: "approved",
+        }),
+      },
+    });
+
+    if (!preference.init_point) return null;
+
+    if (preference.id) {
+      await attachMpPreference(pendingId, preference.id);
+    }
+
+    return preference.init_point;
+  } catch (err) {
+    console.error(
+      `[checkout-pro] Preference creation failed for gift ${giftId}, pending ${pendingId}:`,
+      err,
+    );
+    return null;
+  }
+}
 
 const MAX_BUYER_NAMES = 20;
 const MAX_NAME_LENGTH = 80;
@@ -152,6 +224,17 @@ export async function POST(
     amount,
     ip,
   });
+
+  const checkoutUrl = await tryCreateCheckoutProPreference({
+    pendingId,
+    giftId: id,
+    giftName: gift.name as string,
+    amount,
+  });
+
+  if (checkoutUrl) {
+    return Response.json({ checkoutUrl, amount, pendingId });
+  }
 
   const paymentLinkUrl = await getMercadopagoPaymentLink();
 
