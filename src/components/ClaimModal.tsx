@@ -17,11 +17,14 @@ interface ClaimModalProps {
   onReserved?: () => void;
 }
 
-interface CheckoutResponse {
-  paymentLinkUrl: string;
-  amount: number;
-  pendingId: string;
-}
+// The checkout endpoint returns one of two shapes depending on whether
+// Checkout Pro fired successfully for this request; only the open-link
+// shape is ever held in component state (Checkout Pro redirects immediately).
+type CheckoutApiResponse =
+  | { checkoutUrl: string; amount: number; pendingId: string }
+  | { paymentLinkUrl: string; amount: number; pendingId: string };
+
+type OpenLinkCheckout = { paymentLinkUrl: string; amount: number; pendingId: string };
 
 const BRL = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -49,7 +52,7 @@ export default function ClaimModal({
   const [error, setError] = useState("");
   const [pixCopied, setPixCopied] = useState(false);
   const [amountCopied, setAmountCopied] = useState(false);
-  const [mpCheckout, setMpCheckout] = useState<CheckoutResponse | null>(null);
+  const [mpCheckout, setMpCheckout] = useState<OpenLinkCheckout | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
@@ -98,10 +101,15 @@ export default function ClaimModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buyerInfo),
       });
-      const data = await res.json();
+      const data = (await res.json()) as CheckoutApiResponse & { error?: string };
       if (res.ok) {
-        setMpCheckout(data as CheckoutResponse);
         onReserved?.();
+        if ("checkoutUrl" in data) {
+          // Checkout Pro: go straight into Mercado Pago's hosted checkout.
+          window.location.href = data.checkoutUrl;
+          return;
+        }
+        setMpCheckout(data);
       } else {
         setError(data.error || "Erro ao iniciar pagamento.");
       }

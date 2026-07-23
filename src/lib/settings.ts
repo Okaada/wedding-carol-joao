@@ -19,3 +19,18 @@ export async function getMercadopagoPaymentLink(): Promise<string> {
     ? url
     : DEFAULT_MERCADOPAGO_PAYMENT_LINK;
 }
+
+export async function getMercadopagoCheckoutProEnabled(): Promise<boolean> {
+  const client = await getMongoClient();
+  const doc = await client
+    .db("carol-joao")
+    .collection("settings")
+    .findOne({ key: "mercadopago_checkout_pro" });
+
+  const enabled =
+    doc && doc.value && typeof doc.value === "object"
+      ? (doc.value as { enabled?: unknown }).enabled
+      : undefined;
+
+  return enabled === true;
+}

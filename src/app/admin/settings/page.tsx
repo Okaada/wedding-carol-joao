@@ -1,7 +1,9 @@
 import { getMongoClient } from "@/lib/mongodb";
-import { getMercadopagoPaymentLink } from "@/lib/settings";
+import { getMercadopagoCheckoutProEnabled, getMercadopagoPaymentLink } from "@/lib/settings";
+import { isMercadopagoConfigured } from "@/lib/mercadopago";
 import PixSettingsForm from "@/components/admin/PixSettingsForm";
 import MercadopagoLinkForm from "@/components/admin/MercadopagoLinkForm";
+import MercadopagoCheckoutProToggle from "@/components/admin/MercadopagoCheckoutProToggle";
 import type { PixSettings } from "@/data/types";
 
 export default async function SettingsPage() {
@@ -13,6 +15,7 @@ export default async function SettingsPage() {
 
   const pixSettings = doc?.value as PixSettings | undefined;
   const mercadopagoLink = await getMercadopagoPaymentLink();
+  const checkoutProEnabled = await getMercadopagoCheckoutProEnabled();
 
   return (
     <div>
@@ -29,6 +32,13 @@ export default async function SettingsPage() {
           o valor manualmente seguindo as instruções do modal de compra.
         </p>
         <MercadopagoLinkForm defaultUrl={mercadopagoLink} />
+
+        <div className="mt-4">
+          <MercadopagoCheckoutProToggle
+            defaultEnabled={checkoutProEnabled}
+            isConfigured={isMercadopagoConfigured()}
+          />
+        </div>
       </div>
 
       <div className="mb-8">
