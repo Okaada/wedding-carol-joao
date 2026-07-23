@@ -236,7 +236,7 @@ export async function POST(
     return Response.json({ checkoutUrl, amount, pendingId });
   }
 
-  const paymentLinkUrl = await getMercadopagoPaymentLink();
+  const paymentLinkUrl = getMercadopagoPaymentLink();
 
   return Response.json({ paymentLinkUrl, amount, pendingId });
 }
