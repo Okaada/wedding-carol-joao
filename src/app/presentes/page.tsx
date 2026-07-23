@@ -3,13 +3,14 @@ import type { Filter, Sort } from "mongodb";
 import { getMongoClient } from "@/lib/mongodb";
 import { releaseExpiredReservations } from "@/lib/gifts";
 import { generatePixQrCodeDataUrl, generatePixPayload } from "@/lib/pix";
+import { getPixSettings } from "@/lib/settings";
 import GiftCard from "@/components/GiftCard";
 import Navbar from "@/components/Navbar";
 import Pagination from "@/components/Pagination";
 import GiftListControls from "@/components/gifts/GiftListControls";
 import PixSection from "@/components/PixSection";
 import { toPublicGift } from "@/data/types";
-import type { Gift, PublicGift, PixSettings } from "@/data/types";
+import type { Gift, PublicGift } from "@/data/types";
 
 export const dynamic = "force-dynamic";
 
@@ -158,8 +159,7 @@ export default async function PresentesPage({
     .toArray();
   const gifts: PublicGift[] = docs.map(toPublicGift);
 
-  const pixDoc = await db.collection("settings").findOne({ key: "pix" });
-  const pixSettings = pixDoc?.value as PixSettings | undefined;
+  const pixSettings = getPixSettings();
 
   const pixDataMap: Record<string, { qrCodeUrl: string; payload: string }> = {};
   if (pixSettings) {
