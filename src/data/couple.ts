@@ -41,6 +41,7 @@ export const coupleData: CoupleData = {
       title: "O pedido",
       description:
         "No show da banda favorita da Carol, enquanto tocava a música que ela mais ama, João fez a pergunta mais importante da sua vida. E entre lágrimas, sorrisos e o som da multidão, veio a resposta mais linda: SIM!",
+      image: "/images/timeline-05.jpg",
     },
     {
       date: "24 de outubro de 2026",
