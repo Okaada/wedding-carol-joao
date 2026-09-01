@@ -13,28 +13,28 @@ export const coupleData: CoupleData = {
       title: "Como tudo começou",
       description:
         "Nos conhecemos no ensino médio e, entre olhares e conversas, algo especial foi nascendo — mas nenhum dos dois tinha coragem de dar o primeiro passo. Até que o destino resolveu agir: Julia, a melhor amiga da Carol, pegou o celular e mandou um 'OOOIIII' bem corajoso pro João. E foi assim, de forma leve e divertida, que tudo começou.",
-      image: "/images/timeline-01.svg",
+      image: "/images/timeline-01.jpg",
     },
     {
       date: "27 de fevereiro de 2017",
       title: "O início do namoro",
       description:
         "Depois daquela mensagem, as conversas não pararam mais. Cada dia o assunto rendia mais, e o que começou como amizade foi se transformando em algo que nenhum dos dois conseguia ignorar. Em 27 de fevereiro de 2017, decidimos que era oficial: estávamos juntos.",
-      image: "/images/timeline-02.svg",
+      image: "/images/timeline-02.jpg",
     },
     {
       date: "2017 – 2024",
       title: "Juntos, mesmo à distância",
       description:
         "Ensino médio, vestibular, faculdade, mudanças de cidade, estágios, TCC, início de carreira... ao longo desses 7 anos, a vida foi nos levando por caminhos diferentes, mas o nosso relacionamento nunca deixou de ser prioridade. Mesmo à distância, o amor só ficou mais forte — entre ligações longas, saudade e muita cumplicidade.",
-      image: "/images/timeline-03.svg",
+      image: "/images/timeline-03.jpg",
     },
     {
       date: "2024",
       title: "Finalmente na mesma cidade",
       description:
         "Em 2024, depois de anos mesmo com a distância, nossas rotinas finalmente se cruzaram em Matão. Poder estar juntos no dia a dia, sem contar os quilômetros, nos mostrou com ainda mais certeza o que já sabíamos: queríamos dividir a vida inteira, um do lado do outro.",
-      image: "/images/timeline-04.svg",
+      image: "/images/timeline-04.jpg",
     },
     {
       date: "26 de janeiro de 2025",
